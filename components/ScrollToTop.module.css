@@ -1,0 +1,95 @@
+.wrapper {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(
+    15,
+    23,
+    42,
+    0.8
+  ); /* Dark background matching your Navbar theme */
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.button:hover {
+  transform: translateY(-5px);
+  background: rgba(99, 102, 241, 0.9); /* Indigo/Purple hover */
+  box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.icon {
+  color: #ffffff;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.button:hover .icon {
+  animation: bounce 1s infinite;
+}
+
+/* Optional Progress Ring Styling */
+.progressRing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.progressPath {
+  fill: none;
+  stroke: #ffffff; /* Progress color */
+  stroke-width: 4px; /* Thickness of the ring */
+  stroke-linecap: round;
+  opacity: 0.3; /* Subtle ring */
+}
+
+.button:hover .progressPath {
+  stroke: #ffffff;
+  opacity: 1;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .wrapper {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .button {
+    width: 45px;
+    height: 45px;
+  }
+}
