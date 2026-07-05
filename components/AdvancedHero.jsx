@@ -1,16 +1,23 @@
+"use client";
+
 import React, { useMemo, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import {
   ArrowDownToLine,
   ArrowRight,
   Github,
   Instagram,
   Linkedin,
-  Mouse,
   Twitter,
 } from "lucide-react";
 import FluidRevealCanvas from "./FluidRevealCanvas";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger, SplitText);
+}
 
 const ruchitImg = "https://ik.imagekit.io/devnext/Gemini_Generated_Image_8wt16z8wt16z8wt1.png";
 const ruchitRevealedImg = "https://ik.imagekit.io/devnext/ChatGPT%20Image%20Jul%205,%202026,%2001_30_56%20PM.png";
@@ -79,72 +86,360 @@ function StatsPanel() {
   );
 }
 
-export default function AdvancedHero() {
+export default function AdvancedHero({ isLoading }) {
   const heroRef = useRef(null);
+  const heroContentRef = useRef(null);
   const portraitRef = useRef(null);
   const dividerRef = useRef(null);
+  const bgGlow1Ref = useRef(null);
+  const bgGlow2Ref = useRef(null);
+  const heyRef = useRef(null);
+  const nameRef = useRef(null);
+  const lineDividerRef = useRef(null);
+  const titleRef = useRef(null);
+  const descRef = useRef(null);
+  const buttonsRef = useRef(null);
+  const statsRef = useRef(null);
+  const availabilityRef = useRef(null);
 
+  // Transition Refs
+  const overlayRef = useRef(null);
+  const marqueeContainerRef = useRef(null);
+  const signatureContainerRef = useRef(null);
+  const sigSvgRef = useRef(null);
+  const maskPath1Ref = useRef(null);
+
+  // Entrance Timeline Setup
   useGSAP(() => {
-    const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
-    timeline
-      .from(".hero-enter", { opacity: 0, y: 34, duration: 0.9, stagger: 0.09 })
-      .from(portraitRef.current, { opacity: 0, duration: 1.35 }, "-=1")
-      .from(dividerRef.current, { opacity: 0, scaleY: 0.55, duration: 1.3 }, "-=1.1")
-      .from(".particle", { opacity: 0, scale: 0, duration: 1, stagger: 0.018 }, "-=.8");
+    if (isLoading) return;
 
-    gsap.to(dividerRef.current, {
-      filter: "drop-shadow(0 0 18px rgba(255,86,10,.95))",
-      opacity: 0.82,
-      duration: 1.6,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
+    // Split text nodes for character/word/line animations
+    const heySplit = new SplitText(heyRef.current, { type: "chars" });
+    const nameSplit = new SplitText(nameRef.current, { type: "chars" });
+    const titleSplit = new SplitText(titleRef.current, { type: "words" });
+    const descSplit = new SplitText(descRef.current, { type: "lines" });
+
+    // Set initial states to avoid unstyled flashes
+    gsap.set([bgGlow1Ref.current, bgGlow2Ref.current], { opacity: 0 });
+    gsap.set(portraitRef.current, { opacity: 0, scale: 0.985, filter: "blur(12px)" });
+    gsap.set(dividerRef.current, { opacity: 0, filter: "drop-shadow(0 0 0px rgba(255,86,10,0))" });
+    gsap.set(".particle", { opacity: 0 });
+    gsap.set(lineDividerRef.current, { opacity: 0, scaleX: 0, transformOrigin: "left center" });
+    gsap.set(buttonsRef.current.children, { opacity: 0, y: 15 });
+    gsap.set(statsRef.current, { opacity: 0, y: 15 });
+    gsap.set(availabilityRef.current, { opacity: 0, y: 15 });
+
+    const timeline = gsap.timeline({
+      delay: 0.05, // Cinematic 0.05s delay after preloader completes
+      defaults: { ease: "power3.out" },
+      onComplete: () => {
+        // Revert SplitText to return text back to normal layout
+        heySplit.revert();
+        nameSplit.revert();
+        titleSplit.revert();
+        descSplit.revert();
+      }
     });
-    gsap.to(".particle", { y: -16, opacity: 0.25, duration: 2.4, repeat: -1, yoyo: true, stagger: 0.08, ease: "sine.inOut" });
-  }, { scope: heroRef });
+
+    timeline
+      // Stage 1: Background gradients fade in
+      .to([bgGlow1Ref.current, bgGlow2Ref.current], { opacity: 1, duration: 0.5 })
+      
+      // Stage 2: Portrait appears (scale 0.985 -> 1, opacity, slight blur removal)
+      .to(portraitRef.current, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.2 }, "-=0.2")
+      
+      // Stage 3: Energy divider fades in, glow increases naturally
+      .to(dividerRef.current, {
+        opacity: 0.82,
+        filter: "drop-shadow(0 0 18px rgba(255,86,10,0.95))",
+        duration: 1.5,
+        onComplete: () => {
+          // Infinite glow yoyo loop
+          gsap.to(dividerRef.current, {
+            filter: "drop-shadow(0 0 24px rgba(255,86,10,0.95))",
+            opacity: 0.9,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+          });
+        }
+      }, "-=0.8")
+      
+      // Stage 4: Particle field appears (soft fade, small stagger)
+      .to(".particle", {
+        opacity: 0.4,
+        duration: 1.2,
+        stagger: 0.01,
+        onComplete: () => {
+          // Subtle floating idle motion
+          gsap.to(".particle", {
+            y: -16,
+            opacity: 0.25,
+            duration: 2.4,
+            repeat: -1,
+            yoyo: true,
+            stagger: 0.08,
+            ease: "sine.inOut"
+          });
+        }
+      }, "-=0.6")
+      
+      // Stage 5: SplitText animations sequenced
+      .from(heySplit.chars, {
+        opacity: 0,
+        y: 10,
+        filter: "blur(4px)",
+        stagger: 0.04,
+        duration: 0.6
+      }, "-=0.4")
+      
+      .from(nameSplit.chars, {
+        opacity: 0,
+        y: 15,
+        filter: "blur(6px)",
+        stagger: 0.06,
+        duration: 0.8
+      }, "-=0.3")
+      
+      .to(lineDividerRef.current, {
+        opacity: 1,
+        scaleX: 1,
+        duration: 0.6
+      }, "-=0.4")
+      
+      .from(titleSplit.words, {
+        opacity: 0,
+        y: 12,
+        filter: "blur(4px)",
+        stagger: 0.03,
+        duration: 0.7
+      }, "-=0.4")
+      
+      .from(descSplit.lines, {
+        opacity: 0,
+        y: 12,
+        filter: "blur(3px)",
+        stagger: 0.08,
+        duration: 0.8
+      }, "-=0.4")
+      
+      .to(buttonsRef.current.children, {
+        opacity: 1,
+        y: 0,
+        stagger: 0.1,
+        duration: 0.6
+      }, "-=0.3")
+      
+      .to(statsRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.7
+      }, "-=0.3")
+      
+      .to(availabilityRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.7
+      }, "-=0.3");
+
+  }, { scope: heroRef, dependencies: [isLoading] });
+
+  // Pinned Exit Transition Timeline
+  useGSAP(() => {
+    if (isLoading) return;
+
+    // 1. Infinite Single-Line Marquee slow horizontal sliding loop
+    gsap.to(".marquee-text-1", {
+      xPercent: -100,
+      repeat: -1,
+      duration: 45, // Slow horizontal movement
+      ease: "none"
+    });
+
+    // 2. Set signature mask stroke offset
+    const len1 = maskPath1Ref.current.getTotalLength();
+    gsap.set(maskPath1Ref.current, { strokeDasharray: len1, strokeDashoffset: len1 });
+
+    // 3. ScrollTrigger Exit Timeline (Total Duration: 4.5)
+    const exitTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: heroRef.current,
+        start: "top top",
+        end: "+=260%", // Pins screen for smooth cinematic scrolling experience
+        pin: true,
+        scrub: 1,
+        anticipatePin: 1,
+      }
+    });
+
+    exitTl
+      // Phase 01 & 02: Scale, depth shift, and fade Hero scene out
+      .to(heroContentRef.current, {
+        scale: 0.85,
+        z: -120,
+        yPercent: -4,
+        opacity: 0.75, // Faint silhouette remains visible at 75% opacity
+        transformOrigin: "center center",
+        duration: 1.2,
+        ease: "power2.inOut"
+      }, 0)
+      // Linear overlay opacity progression from 0% -> 50% over the entire timeline duration (4.5)
+      .to(overlayRef.current, {
+        opacity: 0.5, // Overlay maxes out at exactly 50% opacity
+        ease: "none",
+        duration: 4.5
+      }, 0)
+
+      // Phase 03: Fade in Background Moving Typography & Signature Container
+      .to(marqueeContainerRef.current, {
+        opacity: 1.0,
+        duration: 0.5
+      }, 1.0)
+      .to(signatureContainerRef.current, {
+        opacity: 1,
+        duration: 0.5
+      }, 1.0)
+
+      // Phase 04: Real Handwriting signature writes itself continuously (Ruchit -> t-cross -> dot -> flourish loop)
+      .to(maskPath1Ref.current, {
+        strokeDashoffset: 0,
+        duration: 1.8,
+        ease: "power2.inOut"
+      }, 1.4)
+
+      // Phase 05: Signature hold (branding pause)
+      .to({}, { duration: 1.3 }, 3.2)
+
+      // Phase 06: Smoothly dissolve transition components into the About section
+      // Hero completely disappears first
+      .to(heroContentRef.current, {
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.in"
+      }, 4.5)
+      // Signature scales down by 8% and fades
+      .to(signatureContainerRef.current, {
+        scale: 0.92,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.in"
+      }, 4.5)
+      // Marquees fade
+      .to(marqueeContainerRef.current, {
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.in"
+      }, 4.5)
+      // Overlay dissolves completely
+      .to(overlayRef.current, {
+        opacity: 0,
+        duration: 1.0,
+        ease: "power2.in"
+      }, 4.5);
+
+  }, { scope: heroRef, dependencies: [isLoading] });
 
   return (
-    <section ref={heroRef} id="home" className="relative isolate min-h-[900px] overflow-hidden bg-[#020303] text-white md:min-h-[760px] md:h-[100svh]">
-      {/* Background Gradients */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_38%,rgba(255,46,14,.22),transparent_38%),radial-gradient(circle_at_48%_55%,rgba(255,104,28,.08),transparent_25%)]" />
-      <div className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(0deg,#020303_18%,transparent_50%),linear-gradient(90deg,#020303_0%,#020303_34%,rgba(2,3,3,.76)_45%,transparent_68%)]" />
-      <ParticleField />
-      <SocialRail />
+    <section ref={heroRef} id="home" className="relative isolate min-h-[900px] overflow-hidden bg-[#020303] text-white md:min-h-[760px] md:h-[100svh] w-full" style={{ perspective: "1000px" }}>
+      
+      {/* HERO CONTENT: SCALES DOWN AND FADES ON EXIT */}
+      <div ref={heroContentRef} className="w-full h-full relative origin-center">
+        {/* Background Gradients */}
+        <div ref={bgGlow1Ref} className="absolute inset-0 bg-[radial-gradient(circle_at_75%_38%,rgba(255,46,14,.22),transparent_38%),radial-gradient(circle_at_48%_55%,rgba(255,104,28,.08),transparent_25%)]" />
+        <div ref={bgGlow2Ref} className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(0deg,#020303_18%,transparent_50%),linear-gradient(90deg,#020303_0%,#020303_34%,rgba(2,3,3,.76)_45%,transparent_68%)]" />
+        <ParticleField />
+        <SocialRail />
 
-      <div ref={dividerRef} className="energy-divider pointer-events-none absolute -top-[15%] left-[35%] z-[7] hidden h-[130%] w-[25%] origin-center rounded-[50%] border-r-2 border-[#ff681c] drop-shadow-[0_0_10px_#ff4d00] md:block" />
+        <div ref={dividerRef} className="energy-divider pointer-events-none absolute -top-[15%] left-[35%] z-[7] hidden h-[130%] w-[25%] origin-center rounded-[50%] border-r-2 border-[#ff681c] drop-shadow-[0_0_10px_#ff4d00] md:block" />
 
-      <div className="absolute bottom-[58px] left-5 right-5 z-10 sm:left-8 sm:right-8 md:bottom-auto md:left-[8.3vw] md:right-auto md:top-[51%] md:w-[min(535px,36vw)] md:-translate-y-1/2">
-        <p className="hero-enter mb-2 text-sm font-semibold tracking-[.28em] text-[#ff681c] md:mb-3 md:text-base">HEY, I’M</p>
-        <h1 className="hero-enter font-sans text-[clamp(66px,20vw,94px)] font-semibold leading-none tracking-[-.07em] text-[#f5f5f5] md:text-[clamp(76px,8vw,132px)]">Ruchit</h1>
-        <div className="hero-enter my-3 flex items-center gap-3 md:my-4"><span className="h-[3px] w-[118px] bg-gradient-to-r from-[#ff681c] to-[#ff681c]/60" /><i className="h-1.5 w-1.5 rounded-full bg-[#ff681c] shadow-[0_0_8px_#ff681c]" /></div>
-        <h2 className="hero-enter text-lg font-normal leading-[1.35] sm:text-xl md:text-[clamp(21px,1.7vw,29px)]">MERN Stack Developer |<br /><span className="text-[#ff681c]">AI-Assisted</span> Web Developer</h2>
-        <p className="hero-enter mt-4 max-w-[475px] text-[13px] leading-[1.65] text-[#aaa] md:mt-5 md:text-base">I build modern, responsive, and high-performance web applications with clean code and great user experience.</p>
+        <div className="absolute bottom-[58px] left-5 right-5 z-10 sm:left-8 sm:right-8 md:bottom-auto md:left-[8.3vw] md:right-auto md:top-[51%] md:w-[min(535px,36vw)] md:-translate-y-1/2">
+          <p ref={heyRef} className="hero-enter mb-2 text-sm font-semibold tracking-[.28em] text-[#ff681c] md:mb-3 md:text-base">HEY, I’M</p>
+          <h1 ref={nameRef} className="hero-enter font-sans text-[clamp(66px,20vw,94px)] font-semibold leading-none tracking-[-.07em] text-[#f5f5f5] md:text-[clamp(76px,8vw,132px)]">Ruchit</h1>
+          <div ref={lineDividerRef} className="hero-enter my-3 flex items-center gap-3 md:my-4"><span className="h-[3px] w-[118px] bg-gradient-to-r from-[#ff681c] to-[#ff681c]/60" /><i className="h-1.5 w-1.5 rounded-full bg-[#ff681c] shadow-[0_0_8px_#ff681c]" /></div>
+          <h2 ref={titleRef} className="hero-enter text-lg font-normal leading-[1.35] sm:text-xl md:text-[clamp(21px,1.7vw,29px)]">MERN Stack Developer |<br /><span className="text-[#ff681c]">AI-Assisted</span> Web Developer</h2>
+          <p ref={descRef} className="hero-enter mt-4 max-w-[475px] text-[13px] leading-[1.65] text-[#aaa] md:mt-5 md:text-base">I build modern, responsive, and high-performance web applications with clean code and great user experience.</p>
 
-        <div className="hero-enter mt-5 flex items-center gap-4 md:mt-7">
-          <a className="flex h-12 items-center gap-7 rounded-full border border-[#ff681c]/70 px-6 text-sm font-medium text-[#ff7a24] transition hover:bg-[#ff681c] hover:text-black md:h-14 md:px-9 md:text-base" href="#projects" data-magnetic>View My Work <ArrowRight size={18} /></a>
-          <a className="grid h-12 w-12 place-items-center rounded-full border border-white/25 text-[#ff681c] transition hover:border-[#ff681c] md:h-14 md:w-14" href="/resumes/ruchit_full_stack.pdf" target="_blank" aria-label="Download resume"><ArrowDownToLine size={20} /></a>
+          <div ref={buttonsRef} className="hero-enter mt-5 flex items-center gap-4 md:mt-7">
+            <a className="flex h-12 items-center gap-7 rounded-full border border-[#ff681c]/70 px-6 text-sm font-medium text-[#ff7a24] transition hover:bg-[#ff681c] hover:text-black md:h-14 md:px-9 md:text-base" href="#projects" data-magnetic>View My Work <ArrowRight size={18} /></a>
+            <a className="grid h-12 w-12 place-items-center rounded-full border border-white/25 text-[#ff681c] transition hover:border-[#ff681c] md:h-14 md:w-14" href="/resumes/ruchit_full_stack.pdf" target="_blank" aria-label="Download resume"><ArrowDownToLine size={20} /></a>
+          </div>
+          <div ref={statsRef} className="hero-enter"><StatsPanel /></div>
         </div>
-        <div className="hero-enter"><StatsPanel /></div>
+
+        {/* Portrait Graphics Container Box */}
+        <div
+          ref={portraitRef}
+          className="portrait absolute right-0 top-[6%] z-[2] h-[48%] w-[94%] overflow-hidden [--reveal-x:55%] [--reveal-y:42%] sm:w-[82%] md:top-[3%] md:h-[97%] md:w-[58%]"
+        >
+          <FluidRevealCanvas
+            ruchitImg={ruchitImg}
+            ruchitRevealedImg={ruchitRevealedImg}
+          />
+
+          <div className="pointer-events-none absolute inset-0 z-[4] shadow-[inset_0_-120px_100px_#020303] md:shadow-[inset_110px_0_100px_#020303,inset_0_-90px_90px_rgba(2,3,3,.45)]" />
+        </div>
+
+        <div ref={availabilityRef} className="hero-enter absolute bottom-[44px] right-[4vw] z-20 hidden min-w-[330px] items-center gap-4 rounded-[20px] border border-[#ff681c]/60 bg-black/60 px-7 py-5 backdrop-blur-xl md:flex">
+          <i className="h-4 w-4 rounded-full bg-[#ff681c] shadow-[0_0_16px_#ff681c]" />
+          <div className="flex flex-1 flex-col gap-1"><strong className="text-sm font-medium">Available for work</strong><span className="text-xs text-[#999]">Freelance / Fulltime</span></div>
+          <i className="h-2.5 w-2.5 rounded-full bg-green-500 shadow-[0_0_14px_#22c55e]" />
+        </div>
+      </div>      {/* PHASE 02: CINEMATIC BLACK OVERLAY (z-20) */}
+      <div ref={overlayRef} className="pointer-events-none absolute inset-0 z-20 bg-black opacity-0" />
+
+      {/* PHASE 03: INFINITE MOVING TYPOGRAPHY BACKGROUND (z-30) */}
+      <div ref={marqueeContainerRef} className="pointer-events-none absolute inset-0 z-30 flex flex-col justify-center opacity-0 select-none overflow-hidden">
+        {/* Continuous Cinematic Sentence (ONE line, Pure White, Full Visibility) */}
+        <div className="flex whitespace-nowrap text-[4.5vw] sm:text-[3vw] lg:text-[2.2vw] font-heading font-light uppercase select-none leading-none tracking-[0.25em] overflow-hidden" style={{ color: "#FFFFFF" }}>
+          <span className="marquee-text-1 inline-block shrink-0">DESIGNING MEANINGFUL DIGITAL EXPERIENCES WITH INTENTION, PRECISION, MOTION, CURIOSITY, AND CRAFTSMANSHIP. &nbsp;&bull;&nbsp;&nbsp;</span>
+          <span className="marquee-text-1 inline-block shrink-0">DESIGNING MEANINGFUL DIGITAL EXPERIENCES WITH INTENTION, PRECISION, MOTION, CURIOSITY, AND CRAFTSMANSHIP. &nbsp;&bull;&nbsp;&nbsp;</span>
+        </div>
       </div>
 
-      {/* Portrait Graphics Container Box */}
-      <div
-        ref={portraitRef}
-        className="portrait absolute right-0 top-[6%] z-[2] h-[48%] w-[94%] overflow-hidden [--reveal-x:55%] [--reveal-y:42%] sm:w-[82%] md:top-[3%] md:h-[97%] md:w-[58%]"
-      >
-        <FluidRevealCanvas
-          ruchitImg={ruchitImg}
-          ruchitRevealedImg={ruchitRevealedImg}
-        />
+      {/* PHASE 04 & 05: HANDWRITTEN SIGNATURE (CENTERLINE MASK REVEAL) (z-40) */}
+      <div ref={signatureContainerRef} className="pointer-events-none absolute inset-0 z-40 flex justify-center items-center opacity-0">
+        <svg
+          ref={sigSvgRef}
+          viewBox="0 0 792 612"
+          className="w-[90vw] md:w-[80vw] lg:w-[70vw] max-w-[1200px] h-auto overflow-visible pointer-events-none"
+        >
+          <defs>
+            <mask id="sig-exit-mask">
+              <path
+                ref={maskPath1Ref}
+                fill="none"
+                stroke="white"
+                strokeWidth="72"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M 341,166 C 300,130 150,150 90,220 C 50,270 50,330 95,323 C 140,320 220,240 280,180 C 340,120 370,160 320,220 C 260,280 180,330 130,310 C 90,290 100,240 140,230 C 180,220 220,290 240,300 C 260,300 270,260 280,230 C 290,200 300,240 310,270 C 320,300 330,300 340,280 L 350,250 L 231,150 L 202,157 L 535,288 C 537,286 539,290 535,292 L 491,338 C 450,370 300,430 200,430 C 100,430 150,530 300,530 C 500,530 650,450 720,350 C 760,280 750,220 680,210 C 600,200 480,230 400,280 C 350,310 360,350 400,350"
+              />
+            </mask>
+          </defs>
 
-        <div className="pointer-events-none absolute inset-0 z-[4] shadow-[inset_0_-120px_100px_#020303] md:shadow-[inset_110px_0_100px_#020303,inset_0_-90px_90px_rgba(2,3,3,.45)]" />
+
+          <g mask="url(#sig-exit-mask)">
+            <path
+              className="fill-[#ff8000]"
+              d="M341.42,166.48c-4.17-8.94-11.73-14.02-20.76-17.1c-15.16-5.18-30.85-5.56-46.65-4.59 c-14.35,0.88-28.51,2.99-42.53,6.02l-0.56,0.12l-28.74,6.71c-0.34,0.08-9.29,2.75-13.94,4.13c-42.78,12.82-83.49,30.09-120.06,56.2 c-10.84,7.74-20.88,16.41-29.81,26.3c-5.82,6.47-11.07,13.34-14.41,21.47c-4.14,10.05-0.84,18.32,9.3,22.12 c11.82,4.43,23.7,3.8,35.3-1.07c5.11-2.14,8.96-6.56,14.51-8.03c1.63-0.44,2.14-2.11,1.5-3.75c-0.65-1.7-2.06-2.03-3.72-1.73 c-6.48,1.17-12.93,2.54-19.45,3.44c-5.99,0.84-12.04,1.04-17.98-0.74c-4.96-1.49-6.37-4.13-3.71-8.52c2.7-4.46,5.73-8.8,9.18-12.7 c10.4-11.75,22.89-21.07,35.87-29.76c15.16-10.15,31.21-18.71,47.61-26.63c26.83-12.94,54.52-23.64,83.23-31.65 c14.49-4.04,29.15-7.33,44.08-9.18c14.24-1.78,28.55-2.08,42.78-0.07c7.16,1.02,14.22,2.7,20.59,6.48 c8.77,5.19,11.65,13.57,7.3,22.8c-1.6,3.41-3.8,6.62-6.18,9.57c-7.18,8.94-16.15,15.96-25.27,22.78 c-22.09,16.48-46.22,29.5-71.06,41.28c-28.66,13.6-58.26,24.86-88.69,33.87c-3,0.9-6.04,1.71-9.52,2.69 c0.46-0.94,0.64-1.44,0.92-1.88c6.5-10.07,12.74-20.33,19.57-30.19c12.13-17.5,24.64-34.73,36.93-52.12 c2.74-3.89,5.45-7.83,7.8-11.96c1.83-3.21,0.58-6.78-2.24-7.91c-4.55-1.79-11.67,0.21-14.54,4.21 c-7.08,9.88-14.22,19.74-21.13,29.73c-16.77,24.27-32.97,48.9-47.89,74.35c-0.67,1.14-2.11,2.22-3.38,2.54 c-11.15,2.83-22.37,5.39-33.52,8.23c-4.89,1.26-9.75,2.8-14.47,4.61c-2.97,1.15-4.32,4.21-3.88,6.99c0.44,2.7,2.23,4.67,4.87,5.24 c6.66,1.45,13.33,2.85,19.99,4.32c3.44,0.76,6.85,1.66,10.44,2.54c-0.44,0.97-0.67,1.55-0.97,2.11 c-11.43,21.25-21.8,42.96-29,66.07c-2.09,6.7-3.73,13.48-3.85,20.53c-0.08,4.67,2.13,7.86,6.1,8.82c3,0.71,6.02,0.22,8.31-1.83 c2.47-2.2,4.81-4.66,6.68-7.37c2.37-3.44,4.36-7.18,6.22-10.92c0.86-1.71,0.44-3.63-1.1-5.01c-1.62-1.45-3.46-1.45-5.33-0.5 c-0.92,0.48-1.79,1.08-3.21,1.94c7.91-24.44,19.25-46.67,30.55-68.97c0.53,0.12,0.85,0.16,1.13,0.25 c5.64,2.14,11.37,4.09,16.92,6.47c28.93,12.4,57.88,24.79,86.7,37.43c14.93,6.54,29.61,13.64,44.44,20.38 c1.67,0.76,3.66,1.07,5.52,1.14c2.94,0.13,5.29-1.51,6.18-3.98c0.99-2.75,0.36-5.3-1.72-7.21c-1.97-1.82-4.11-3.66-6.49-4.81 c-13.03-6.25-26.06-12.5-39.27-18.36c-16.57-7.35-33.23-14.51-49.99-21.41c-17.93-7.39-36.03-14.37-54.04-21.54 c-0.64-0.25-1.25-0.58-1.93-0.9c0.35-0.78,0.57-1.37,0.88-1.93c1.82-3.26,3.89-6.41,5.41-9.8c1.72-3.8,4.65-5.17,8.45-6.24 c24.47-6.9,48.46-15.31,72.17-24.45c28.76-11.09,56.83-23.65,83.7-38.79c16.75-9.43,32.62-20.13,45.97-34.14 c5.34-5.61,10.08-11.67,13.13-18.89C344.5,184.75,345.67,175.62,341.42,166.48z M95.92,323.39c-0.25,0.4-1.2,0.58-1.77,0.48 c-3.89-0.7-7.77-1.49-11.65-2.26c-0.02-0.17-0.05-0.35-0.07-0.53c5.44-1.19,10.87-2.36,17.03-3.69 C98.06,319.8,97.08,321.66,95.92,323.39z"
+            />
+            <path
+              className="fill-[#ff8000]"
+              d="M491.33,338.01c-1.65,1.07-2.72,1.81-3.84,2.48c-9.23,5.46-18.36,11.1-27.76,16.26 c-2.89,1.59-6.47,2.41-9.79,2.64c-8.21,0.56-12.08-5.45-8.69-13.03c3.12-6.97,7.88-12.84,12.71-18.67 c2.38-2.88,4.68-5.83,6.99-8.76c0.47-0.6,0.82-1.28,1.62-2.56c-1.74,0.19-2.9,0.16-3.95,0.47c-7.27,2.15-13.54,6.23-19.64,10.56 c-16.86,11.96-31.43,26.32-44.19,42.54c-0.34,0.44-0.67,0.9-1.06,1.29c-1.68,1.67-4.48,2.16-6.11,0.87 c-1.82-1.43-1.96-3.53-1.02-5.4c1.67-3.33,3.38-6.69,5.55-9.69c5.22-7.2,10.73-14.21,16.11-21.29c0.33-0.43,0.64-0.88,0.71-1.73 c-1.48,0.71-2.97,1.39-4.43,2.14c-12.01,6.2-23.85,12.74-36.08,18.47c-6.27,2.94-13.1,4.95-19.89,6.46 c-5.82,1.29-11.9,1.09-17.24-2.54c-4.37-2.97-6.41-7.96-5.05-13.09c0.78-2.94,1.95-5.77,3.09-9.07c-4.43,2.87-8.42,5.71-12.65,8.15 c-7.56,4.38-15.14,8.74-22.94,12.67c-4.42,2.23-9.34,3.19-14.37,1.7c-4.99-1.48-7.93-6.45-6.75-11.54c0.5-2.15,1.09-4.29,1.78-6.39 c0.67-2.01,1.54-3.95,1.93-6.29c-1.27,0.96-2.56,1.89-3.81,2.88c-7.41,5.89-14.66,12.03-23.18,16.29 c-2.94,1.47-6.17,2.57-9.39,3.24c-7.67,1.6-13.16-4.25-11.56-11.98c1.06-5.15,3.23-9.85,6.31-14.02 c5.51-7.47,11.27-14.77,16.99-22.09c0.77-0.99,1.74-1.91,2.8-2.55c2.26-1.37,5.03-0.92,6.52,0.85c1.58,1.86,1.6,4.31-0.13,6.56 c-3.89,5.03-8.01,9.89-11.72,15.05c-3.1,4.3-5.91,8.84-8.52,13.46c-0.83,1.47-0.61,3.55-0.87,5.35c1.64-0.38,3.51-0.38,4.89-1.2 c5.25-3.14,10.53-6.27,15.43-9.9c7.66-5.68,15.06-11.72,22.47-17.72c3.58-2.9,6.92-6.09,10.38-9.14c2.2-1.94,4.65-3.3,7.72-3.21 c1.8,0.05,3.61,0.47,4.05,2.27c0.38,1.54,0.3,3.49-0.35,4.89c-0.81,1.74-2.37,3.16-3.68,4.65c-6.2,7.1-11.6,14.75-15.68,23.26 c-1.08,2.25-1.79,4.76-2.21,7.23c-0.36,2.14,0.78,3.08,2.86,2.43c3.32-1.04,6.67-2.16,9.77-3.7c15.86-7.9,30.27-18.11,44.7-28.28 c7.26-5.12,14.4-10.54,23-13.35c4.65-1.52,9.37-2.41,14.28-1.15c4.41,1.13,7.26,4.07,7.58,8.1c0.3,3.76-3.13,9.37-6.67,10.45 c-1.03,0.31-2.71,0.03-3.43-0.66c-0.66-0.63-0.57-2.2-0.52-3.34c0.04-0.83,0.73-1.61,0.82-2.45c0.11-1.1,0.32-2.6-0.26-3.24 c-0.62-0.68-2.37-1.09-3.2-0.7c-4,1.87-8.13,3.66-11.71,6.2c-8.45,5.98-15.63,13.25-20.4,22.61c-0.5,0.98-0.92,2.02-1.27,3.07 c-1.72,5.15,0.31,8.27,5.74,8.08c3.68-0.13,7.42-0.81,10.97-1.82c12.15-3.47,23.33-9.27,34.57-14.88 c9.74-4.86,19.45-9.79,29.16-14.72c0.75-0.38,1.45-0.97,1.98-1.62c9.91-12.13,19.78-24.28,29.67-36.42 c9.13-11.22,18.21-22.49,27.43-33.63c10.04-12.13,20.18-24.18,30.38-36.17c1.29-1.52,3.07-2.86,4.9-3.62 c3.05-1.28,5.95,1.32,4.77,4.39c-1.2,3.13-2.85,6.25-4.95,8.85c-7.34,9.1-14.91,18-22.47,26.92 c-14.86,17.54-29.79,35.01-44.63,52.56c-5.7,6.74-11.27,13.59-16.89,20.4c-0.48,0.58-0.93,1.2-1.09,2.13 c2.32-1.57,4.63-3.17,6.98-4.7c7.34-4.77,14.74-9.5,23.35-11.63c2.69-0.66,5.69-0.81,8.41-0.37c4.01,0.64,6.4,4.64,4.98,8.48 c-1.3,3.51-3.18,6.9-5.33,9.99c-4.68,6.71-9.71,13.18-14.55,19.78c-0.69,0.95-1.19,2.07-1.63,3.17c-0.24,0.6-0.17,1.32-0.23,1.98 c0.68,0.01,1.47,0.26,2.03,0c5.1-2.39,10.32-4.59,15.2-7.37c16.57-9.44,31.64-21.02,46.43-32.99c1.23-1,2.52-1.96,3.89-2.75 c2.19-1.26,4.78-0.92,6.12,0.65c1.38,1.62,1.3,3.69-0.5,5.83c-3.74,4.44-7.87,8.57-11.32,13.22c-5,6.75-9.64,13.77-14.17,20.85 c-0.9,1.4-0.6,3.57-0.85,5.38c1.83-0.1,3.92,0.35,5.45-0.38c7.45-3.56,15.02-6.98,22.03-11.29c13.53-8.33,26.75-17.18,40.01-25.94 c1.93-1.27,3.55-3.12,5.04-4.92c7.59-9.19,15.1-18.45,22.62-27.7c4-4.92,7.95-9.87,12.36-15.34c-2.8,0.12-5.04,0.15-7.26,0.34 c-10.06,0.83-20.11,1.7-30.17,2.57c-11.16,0.96-22.32,1.93-33.48,2.89c-0.95,0.08-1.91,0.14-2.86,0.05c-1.74-0.17-3.11-1-3.29-2.85 c-0.17-1.76,0.71-3.23,2.43-3.65c2.61-0.63,5.29-1.12,7.96-1.36c10.67-0.95,21.35-1.81,32.03-2.65 c12.99-1.01,25.99-1.97,38.98-2.94c1.83-0.14,3.2-0.84,4.42-2.34c6.57-8.08,13.19-16.12,19.95-24.03c2.21-2.58,4.91-4.74,7.41-7.07 c0.4-0.37,0.89-0.66,1.38-0.92c2.42-1.26,4.92-1.12,6.2,0.34c1.32,1.5,1.13,3.84-0.66,6.1c-6.74,8.45-13.52,16.87-20.28,25.31 c-0.23,0.29-0.41,0.61-0.55,0.83c4.5,0,8.9,0.07,13.3-0.02c5.88-0.12,11.77-0.35,17.65-0.58c11.27-0.43,22.54-0.93,33.82-1.34 c10.09-0.36,20.18-0.82,30.27-0.91c13.75-0.13,27.51,0.02,41.26,0.13c1.96,0.02,3.96,0.29,5.86,0.78c0.77,0.2,1.85,1.35,1.8,1.98 c-0.07,0.87-0.94,2.08-1.75,2.38c-1.44,0.54-3.1,0.69-4.67,0.7c-14.33,0.09-28.66-0.11-42.98,0.21 c-15.98,0.37-31.95,1.18-47.92,1.84c-7.94,0.32-15.89,0.65-23.83,1.11c-9.21,0.53-18.41,1.13-27.6,1.89 c-1.3,0.11-2.87,1-3.73,2.03c-12.97,15.58-25.84,31.24-38.74,46.88c-5.81,7.05-11.88,13.92-17.37,21.21 c-9.56,12.69-18.76,25.64-28.1,38.49c-0.17,0.23-0.23,0.55-0.54,1.29c0.89-0.48,1.42-0.71,1.88-1.03 c22.31-15.4,44.61-30.82,66.93-46.2c5.56-3.83,11.22-7.52,16.84-11.27c0.52-0.35,1.09-0.66,1.67-0.91 c1.46-0.63,2.84-0.58,3.76,0.89c0.95,1.52,0.26,2.75-1,3.68c-5.24,3.88-10.48,7.76-15.76,11.57 c-13.68,9.85-27.34,19.73-41.09,29.48c-10.12,7.17-20.28,14.29-30.58,21.21c-10.55,7.09-18.76,16.38-26.07,26.6 c-0.63,0.88-1.41,2.02-2.32,2.26c-1.23,0.33-2.97,0.34-3.92-0.33c-0.82-0.59-1.35-2.42-1.11-3.49c0.45-1.97,1.34-3.93,2.44-5.64 c5.71-8.8,11.5-17.55,17.36-26.26c7.85-11.67,15.77-23.31,23.72-34.92c2.24-3.28,4.72-6.4,7.07-9.6c0.3-0.41,0.52-0.87,0.44-1.7 c-2.44,1.67-4.84,3.41-7.33,5c-11.31,7.24-22.49,14.7-34.06,21.51c-4.35,2.56-9.49,4.17-14.48,5.13 c-8.47,1.63-14.13-4.6-12.27-12.97c0.47-2.14,1.44-4.2,2.38-6.21C488.68,342.56,489.89,340.62,491.33,338.01z"
+            />
+            <path
+              className="fill-[#ff8000]"
+              d="M540.75,288.71c0.04,3.32-2.62,5.93-6.09,5.97c-2.93,0.04-5.05-1.85-5.09-4.53c-0.04-2.84,3.1-6.01,5.99-6.06 C538.66,284.04,540.71,285.86,540.75,288.71z"
+            />
+            <path
+              className="fill-[#ff8000]"
+              d="M231.49,150.81 L230.94,150.93 L202.66,157.45"
+            />
+          </g>
+        </svg>
       </div>
 
-      <div className="hero-enter absolute bottom-[44px] right-[4vw] z-20 hidden min-w-[330px] items-center gap-4 rounded-[20px] border border-[#ff681c]/60 bg-black/60 px-7 py-5 backdrop-blur-xl md:flex">
-        <i className="h-4 w-4 rounded-full bg-[#ff681c] shadow-[0_0_16px_#ff681c]" />
-        <div className="flex flex-1 flex-col gap-1"><strong className="text-sm font-medium">Available for work</strong><span className="text-xs text-[#999]">Freelance / Fulltime</span></div>
-        <i className="h-2.5 w-2.5 rounded-full bg-green-500 shadow-[0_0_14px_#22c55e]" />
-      </div>
     </section>
   );
 }

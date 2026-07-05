@@ -88,4 +88,21 @@ Backend: Node.js, Express, REST APIs, GraphQL, Socket.io
 Data: PostgreSQL, MongoDB, Python, Data Analysis, Redis
 DevOps: Git & GitHub, Docker, AWS (Basic), CI/CD, Linux
 
-Please output the refactored code using React Three Fiber, GSAP, and Tailwind, starting with the main App/Canvas structure and the ScrollTrigger logic. */
+// Please output the refactored code using React Three Fiber, GSAP, and Tailwind, starting with the main App/Canvas structure and the ScrollTrigger logic. */
+
+/* ScrollSmoother CSS Base Styles */
+#smooth-wrapper {
+  overflow: hidden;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#smooth-content {
+  overflow: visible;
+  width: 100%;
+}
