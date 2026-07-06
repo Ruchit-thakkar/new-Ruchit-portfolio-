@@ -13,11 +13,13 @@ import Navbar from "./Navbar";
 import Scene3D from "./Scene3D";
 import AdvancedHero from "./AdvancedHero";
 import About from "./About";
+import Projects from "./Projects";
 import Contact from "./Contact";
 import Footer from "./Footer";
 import ScrollToTop from "./ScrollToTop";
 import Preloader from "./Preloader";
 import CustomCursor from "./CustomCursor";
+
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
@@ -124,6 +126,7 @@ export default function PortfolioClient() {
             <main>
               <AdvancedHero isLoading={isLoading} />
               <About isLoading={isLoading} />
+              <Projects />
               <Contact />
             </main>
             <Footer />

@@ -25,6 +25,11 @@ export const metadata = {
     "Next.js Developer",
     "Portfolio",
   ],
+  icons: {
+    icon: "/Untitled-1-01.svg",
+    shortcut: "/Untitled-1-01.svg",
+    apple: "/Untitled-1-01.svg",
+  },
 };
 
 export const viewport = {

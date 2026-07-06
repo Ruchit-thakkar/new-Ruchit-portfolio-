@@ -8,6 +8,7 @@ export default function CustomCursor() {
   useEffect(() => {
     const dot = cursorDotRef.current;
     const follower = cursorFollowerRef.current;
+    if (!dot || !follower) return;
 
     // QuickTo for high-performance mouse tracking
     const xToFull = gsap.quickTo(follower, "x", { duration: 0.15, ease: "power3" });
@@ -25,42 +26,72 @@ export default function CustomCursor() {
 
     window.addEventListener("mousemove", moveCursor);
 
-    // Magnetic and interact elements
-    const elements = document.querySelectorAll("a, button, [data-magnetic]");
-    const handleEnter = () => {
-      gsap.to(follower, { scale: 3, backgroundColor: "var(--color-primary)", mixBlendMode: "difference", duration: 0.3 });
-      gsap.to(dot, { opacity: 0, duration: 0.1 });
-    };
-    const handleLeave = () => {
-      gsap.to(follower, { scale: 1, backgroundColor: "transparent", mixBlendMode: "normal", duration: 0.3 });
-      gsap.to(dot, { opacity: 1, duration: 0.1 });
-    };
-
-    elements.forEach((el) => {
-      el.addEventListener("mouseenter", handleEnter);
-      el.addEventListener("mouseleave", handleLeave);
-      
-      // Magnetic effect logic
-      if (el.hasAttribute("data-magnetic")) {
-        el.addEventListener("mousemove", (e) => {
-          const rect = el.getBoundingClientRect();
-          const x = (e.clientX - rect.left - rect.width / 2) * 0.4;
-          const y = (e.clientY - rect.top - rect.height / 2) * 0.4;
-          gsap.to(el, { x, y, duration: 0.4, ease: "power3.out" });
+    // Event delegation for hover states
+    const handleMouseOver = (e) => {
+      const target = e.target.closest("a, button, [data-magnetic]");
+      if (target) {
+        gsap.to(follower, {
+          scale: 3,
+          backgroundColor: "var(--color-primary)",
+          mixBlendMode: "difference",
+          duration: 0.3
         });
-        el.addEventListener("mouseleave", () => {
-          gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
+        gsap.to(dot, {
+          opacity: 0,
+          duration: 0.1
         });
       }
-    });
+    };
+
+    const handleMouseOut = (e) => {
+      const target = e.target.closest("a, button, [data-magnetic]");
+      if (target) {
+        gsap.to(follower, {
+          scale: 1,
+          backgroundColor: "transparent",
+          mixBlendMode: "normal",
+          duration: 0.3
+        });
+        gsap.to(dot, {
+          opacity: 1,
+          duration: 0.1
+        });
+      }
+    };
+
+    // Event delegation for magnetic movement
+    const handleMouseMoveMagnetic = (e) => {
+      const target = e.target.closest("[data-magnetic]");
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) * 0.4;
+        const y = (e.clientY - rect.top - rect.height / 2) * 0.4;
+        gsap.to(target, { x, y, duration: 0.4, ease: "power3.out" });
+      }
+    };
+
+    const handleMouseOutMagnetic = (e) => {
+      const target = e.target.closest("[data-magnetic]");
+      if (target) {
+        const relatedTarget = e.relatedTarget;
+        // Only reset if cursor has actually left the magnetic boundary
+        if (!relatedTarget || !target.contains(relatedTarget)) {
+          gsap.to(target, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
+        }
+      }
+    };
+
+    document.addEventListener("mouseover", handleMouseOver);
+    document.addEventListener("mouseout", handleMouseOut);
+    document.addEventListener("mousemove", handleMouseMoveMagnetic);
+    document.addEventListener("mouseout", handleMouseOutMagnetic);
 
     return () => {
       window.removeEventListener("mousemove", moveCursor);
-      elements.forEach((el) => {
-        el.removeEventListener("mouseenter", handleEnter);
-        el.removeEventListener("mouseleave", handleLeave);
-        el.removeEventListener("mousemove", null); // Simplistic cleanup
-      });
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
+      document.removeEventListener("mousemove", handleMouseMoveMagnetic);
+      document.removeEventListener("mouseout", handleMouseOutMagnetic);
     };
   }, []);
 
