@@ -1,4 +1,6 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,900,400,300&display=swap');
 @import "tailwindcss";
+
 
 @theme {
   --color-primary: #ff8000;

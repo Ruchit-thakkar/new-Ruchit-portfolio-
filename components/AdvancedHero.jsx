@@ -107,7 +107,10 @@ export default function AdvancedHero({ isLoading }) {
   const marqueeContainerRef = useRef(null);
   const signatureContainerRef = useRef(null);
   const sigSvgRef = useRef(null);
-  const maskPath1Ref = useRef(null);
+  const stop1Ref = useRef(null);
+  const stop2Ref = useRef(null);
+  const stop3Ref = useRef(null);
+  const stop4Ref = useRef(null);
 
   // Entrance Timeline Setup
   useGSAP(() => {
@@ -257,9 +260,9 @@ export default function AdvancedHero({ isLoading }) {
       ease: "none"
     });
 
-    // 2. Set signature mask stroke offset
-    const len1 = maskPath1Ref.current.getTotalLength();
-    gsap.set(maskPath1Ref.current, { strokeDasharray: len1, strokeDashoffset: len1 });
+    // 2. Set signature gradient stops initial state
+    gsap.set(stop1Ref.current, { attr: { offset: "0%" } });
+    gsap.set(stop2Ref.current, { attr: { offset: "0%" } });
 
     // 3. ScrollTrigger Exit Timeline (Total Duration: 4.5)
     const exitTl = gsap.timeline({
@@ -301,11 +304,18 @@ export default function AdvancedHero({ isLoading }) {
         duration: 0.5
       }, 1.0)
 
-      // Phase 04: Real Handwriting signature writes itself continuously (Ruchit -> t-cross -> dot -> flourish loop)
-      .to(maskPath1Ref.current, {
-        strokeDashoffset: 0,
-        duration: 1.8,
-        ease: "power2.inOut"
+      // Phase 04: Real Handwriting signature writes itself continuously via gradient sweep
+      .to({ pos: 0 }, {
+        pos: 1.15,
+        duration: 2.0,
+        ease: "power2.inOut",
+        onUpdate: function() {
+          if (stop1Ref.current && stop2Ref.current) {
+            // Animate stops to sweep from left (0) to right (1) with a soft 15% feather
+            stop1Ref.current.setAttribute("offset", `${Math.max(0, this.targets()[0].pos - 0.15) * 100}%`);
+            stop2Ref.current.setAttribute("offset", `${Math.min(1.0, this.targets()[0].pos) * 100}%`);
+          }
+        }
       }, 1.4)
 
       // Phase 05: Signature hold (branding pause)
@@ -385,39 +395,36 @@ export default function AdvancedHero({ isLoading }) {
           <div className="flex flex-1 flex-col gap-1"><strong className="text-sm font-medium">Available for work</strong><span className="text-xs text-[#999]">Freelance / Fulltime</span></div>
           <i className="h-2.5 w-2.5 rounded-full bg-green-500 shadow-[0_0_14px_#22c55e]" />
         </div>
-      </div>      {/* PHASE 02: CINEMATIC BLACK OVERLAY (z-20) */}
+      </div>
+
+      {/* PHASE 02: CINEMATIC BLACK OVERLAY (z-20) */}
       <div ref={overlayRef} className="pointer-events-none absolute inset-0 z-20 bg-black opacity-0" />
 
       {/* PHASE 03: INFINITE MOVING TYPOGRAPHY BACKGROUND (z-30) */}
       <div ref={marqueeContainerRef} className="pointer-events-none absolute inset-0 z-30 flex flex-col justify-center opacity-0 select-none overflow-hidden">
-        {/* Continuous Cinematic Sentence (ONE line, Pure White, Full Visibility) */}
-        <div className="flex whitespace-nowrap text-[4.5vw] sm:text-[3vw] lg:text-[2.2vw] font-heading font-light uppercase select-none leading-none tracking-[0.25em] overflow-hidden" style={{ color: "#FFFFFF" }}>
-          <span className="marquee-text-1 inline-block shrink-0">DESIGNING MEANINGFUL DIGITAL EXPERIENCES WITH INTENTION, PRECISION, MOTION, CURIOSITY, AND CRAFTSMANSHIP. &nbsp;&bull;&nbsp;&nbsp;</span>
-          <span className="marquee-text-1 inline-block shrink-0">DESIGNING MEANINGFUL DIGITAL EXPERIENCES WITH INTENTION, PRECISION, MOTION, CURIOSITY, AND CRAFTSMANSHIP. &nbsp;&bull;&nbsp;&nbsp;</span>
+        <div className="flex whitespace-nowrap text-[4.5vw] sm:text-[3vw] lg:text-[2.2vw] font-heading select-none leading-none tracking-[0.25em] overflow-hidden" style={{ color: "#FFFFFF", fontFamily: "'Satoshi', sans-serif", fontWeight: 900 }}>
+          <span className="marquee-text-1 inline-block shrink-0">EVERY PIXEL HAS A PURPOSE &bull; EVERY INTERACTION TELLS A STORY &bull; EVERY EXPERIENCE IS CRAFTED TO LEAVE A LASTING IMPRESSION &bull;&nbsp;&nbsp;</span>
+          <span className="marquee-text-1 inline-block shrink-0">EVERY PIXEL HAS A PURPOSE &bull; EVERY INTERACTION TELLS A STORY &bull; EVERY EXPERIENCE IS CRAFTED TO LEAVE A LASTING IMPRESSION &bull;&nbsp;&nbsp;</span>
         </div>
       </div>
 
-      {/* PHASE 04 & 05: HANDWRITTEN SIGNATURE (CENTERLINE MASK REVEAL) (z-40) */}
+      {/* PHASE 04 & 05: HANDWRITTEN SIGNATURE (GRADIENT SWEEP MASK REVEAL) (z-40) */}
       <div ref={signatureContainerRef} className="pointer-events-none absolute inset-0 z-40 flex justify-center items-center opacity-0">
         <svg
           ref={sigSvgRef}
           viewBox="0 0 792 612"
-          className="w-[90vw] md:w-[80vw] lg:w-[70vw] max-w-[1200px] h-auto overflow-visible pointer-events-none"
+          className="w-[90vw] md:w-[80vw] lg:w-[75vw] max-w-[1200px] h-auto overflow-visible pointer-events-none"
         >
           <defs>
-            <mask id="sig-exit-mask">
-              <path
-                ref={maskPath1Ref}
-                fill="none"
-                stroke="white"
-                strokeWidth="72"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M 341,166 C 300,130 150,150 90,220 C 50,270 50,330 95,323 C 140,320 220,240 280,180 C 340,120 370,160 320,220 C 260,280 180,330 130,310 C 90,290 100,240 140,230 C 180,220 220,290 240,300 C 260,300 270,260 280,230 C 290,200 300,240 310,270 C 320,300 330,300 340,280 L 350,250 L 231,150 L 202,157 L 535,288 C 537,286 539,290 535,292 L 491,338 C 450,370 300,430 200,430 C 100,430 150,530 300,530 C 500,530 650,450 720,350 C 760,280 750,220 680,210 C 600,200 480,230 400,280 C 350,310 360,350 400,350"
-              />
+            <linearGradient id="sig-grad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
+              <stop ref={stop1Ref} offset="0%" stopColor="white" />
+              <stop ref={stop2Ref} offset="0%" stopColor="white" />
+              <stop offset="0%" stopColor="black" />
+            </linearGradient>
+            <mask id="sig-exit-mask" maskContentUnits="objectBoundingBox">
+              <rect width="1" height="1" fill="url(#sig-grad)" />
             </mask>
           </defs>
-
 
           <g mask="url(#sig-exit-mask)">
             <path
