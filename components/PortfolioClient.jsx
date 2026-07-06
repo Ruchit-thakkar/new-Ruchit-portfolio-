@@ -1,16 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
-import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
 
 // --- Components ---
 import Navbar from "./Navbar";
-import Scene3D from "./Scene3D";
 import AdvancedHero from "./AdvancedHero";
 import About from "./About";
 import Projects from "./Projects";
@@ -37,20 +33,18 @@ export default function PortfolioClient() {
     });
   }, []);
 
-  // Initialize ScrollSmoother and control its play/paused state based on loader status
-  useGSAP(() => {
-    const smoother = ScrollSmoother.create({
-      wrapper: "#smooth-wrapper",
-      content: "#smooth-content",
-      smooth: 1.5,
-      effects: true,
-    });
-
-    if (isLoading) {
-      smoother.paused(true);
-    } else {
-      smoother.paused(false);
+  // Initialize ScrollSmoother once, then control pause state
+  useEffect(() => {
+    let smoother = ScrollSmoother.get();
+    if (!smoother) {
+      smoother = ScrollSmoother.create({
+        wrapper: "#smooth-wrapper",
+        content: "#smooth-content",
+        smooth: 1.5,
+        effects: true,
+      });
     }
+    smoother.paused(isLoading);
   }, [isLoading]);
 
   // Global anchor click smooth scrolling via ScrollSmoother
@@ -92,31 +86,7 @@ export default function PortfolioClient() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0b0c10_100%)] opacity-70" />
         </div>
 
-        {/* GLOBAL FIXED 3D CANVAS LAYER */}
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <Canvas
-            camera={{ position: [0, 0, 7], fov: 50 }}
-            gl={{
-              antialias: true,
-              alpha: true,
-              powerPreference: "high-performance",
-            }}
-          >
-            <ambientLight intensity={0.5} />
-            <directionalLight
-              position={[10, 10, 5]}
-              intensity={1.5}
-              color="#ff9f1c"
-            />
-            <spotLight
-              position={[-10, -10, -5]}
-              intensity={1}
-              color="#457b9d"
-            />
-            <Scene3D />
-            <Environment preset="city" />
-          </Canvas>
-        </div>
+
 
         {/* SCROLLABLE CONTENT LAYER */}
         <div id="smooth-wrapper">

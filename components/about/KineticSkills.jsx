@@ -209,12 +209,6 @@ export default function KineticSkills({ isLoading = false }) {
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
-      // Initial state
-      gsap.set(".skills-slide-track", { xPercent: 0 });
-      gsap.set(".tech-line-mask", { clipPath: "polygon(0 0, 0 100%, 0 100%, 0 0)" });
-      gsap.set(".slide-bg-visual", { scale: 1.25, opacity: 0 });
-      gsap.set(".slide-spec-row", { y: 20, opacity: 0 });
-
       if (prefersReducedMotion) {
         gsap.set(".tech-line-mask", { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" });
         gsap.set(".slide-bg-visual", { scale: 1.0, opacity: 1 });
@@ -224,113 +218,122 @@ export default function KineticSkills({ isLoading = false }) {
 
       const mm = gsap.matchMedia();
 
-      // Desktop: Horizontal Scroll Chapter Slideshow
+      // Desktop Sequence Config (Pinned Scroll Injection)
       mm.add("(min-width: 1024px)", () => {
+        const totalSlides = skillsData.length + 1; // 7 skills + 1 outro layout frame
+
         const pinTimeline = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
-            end: "+=700%", // 7 transitions (8 slides total)
+            end: `+=${(totalSlides - 1) * 100}%`,
             pin: true,
             scrub: 1,
             invalidateOnRefresh: true,
           },
         });
 
-        // 1. Horizontally shift the track
-        pinTimeline.to(".skills-slide-track", {
-          xPercent: -87.5, // 100 * 7 / 8
-          ease: "none",
-          duration: 7.0,
-        }, 0);
+        // 1. Move the slider viewport track horizontally
+        pinTimeline.fromTo(
+          ".skills-slide-track",
+          { xPercent: 0 },
+          {
+            xPercent: -100 * ((totalSlides - 1) / totalSlides),
+            ease: "none",
+            duration: totalSlides - 1,
+          },
+          0
+        );
 
-        // 2. Animate details per slide in steps
+        // 2. Continuous two-way scrub mapping logic for all slides
         skillsData.forEach((cat, idx) => {
-          const startOffset = idx * 1.0;
+          const startTime = idx;
 
-          // Reveal mask lines
-          pinTimeline.to(
+          // For slide 0, set visible state directly; clean execution window on reverse
+          if (idx === 0) {
+            pinTimeline.fromTo(`.slide-${idx} .tech-line-mask`,
+              { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" },
+              { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", duration: 0.1 },
+              0
+            );
+            pinTimeline.fromTo(`.slide-${idx} .slide-bg-visual`, { scale: 1, opacity: 1 }, { scale: 1, opacity: 1, duration: 0.1 }, 0);
+            pinTimeline.fromTo(`.slide-${idx} .slide-spec-row`, { y: 0, opacity: 1 }, { y: 0, opacity: 1, duration: 0.1 }, 0);
+            pinTimeline.to(".skills-backing-glow", { backgroundColor: `${cat.color}07`, duration: 0.5 }, 0);
+            return;
+          }
+
+          // Use fromTo constraints everywhere else so backward scrolls cleanly reset state positions
+          pinTimeline.fromTo(
             `.slide-${idx} .tech-line-mask`,
+            { clipPath: "polygon(0 0, 0 100%, 0 100%, 0 0)" },
             {
               clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-              stagger: 0.12,
-              duration: 0.8,
+              stagger: 0.08,
+              duration: 0.5,
               ease: "power2.out",
             },
-            startOffset + 0.1
+            startTime + 0.1
           );
 
-          // Animate backdrop visual
           pinTimeline.fromTo(
             `.slide-${idx} .slide-bg-visual`,
             { scale: 1.25, opacity: 0 },
-            { scale: 1.0, opacity: 1, duration: 1.0, ease: "power2.out" },
-            startOffset
+            { scale: 1.0, opacity: 1, duration: 0.5, ease: "power2.out" },
+            startTime
           );
 
-          // Reveal specs
-          pinTimeline.to(
+          pinTimeline.fromTo(
             `.slide-${idx} .slide-spec-row`,
-            { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-            startOffset + 0.4
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+            startTime + 0.2
           );
 
-          // Background glow transitions
           pinTimeline.to(
             ".skills-backing-glow",
-            { backgroundColor: `${cat.color}07`, duration: 0.8 },
-            startOffset
+            { backgroundColor: `${cat.color}07`, duration: 0.5 },
+            startTime
           );
         });
 
-        // Outro slide animation
+        // Outro card viewport visibility logic
         pinTimeline.fromTo(
           ".slide-outro .outro-creed",
           { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.8 },
-          7.0
+          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+          skillsData.length
         );
       });
 
-      // Mobile: Vertical Stacking Layout scroll transitions
+      // Mobile Display Progression Config
       mm.add("(max-width: 1023px)", () => {
-        skillsData.forEach((cat, idx) => {
-          gsap.to(`.slide-${idx} .tech-line-mask`, {
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-            stagger: 0.12,
-            duration: 0.8,
+        skillsData.forEach((_, idx) => {
+          const mobileTl = gsap.timeline({
             scrollTrigger: {
               trigger: `.slide-${idx}`,
-              start: "top 80%",
-              end: "top 40%",
+              start: "top 75%",
+              end: "top 25%",
               scrub: 1,
-            },
+            }
           });
 
-          gsap.to(`.slide-${idx} .slide-bg-visual`, {
-            opacity: 1,
-            scale: 1.0,
-            scrollTrigger: {
-              trigger: `.slide-${idx}`,
-              start: "top 80%",
-              end: "top 40%",
-              scrub: 1,
-            },
-          });
-
-          gsap.to(`.slide-${idx} .slide-spec-row`, {
-            opacity: 1,
-            y: 0,
-            scrollTrigger: {
-              trigger: `.slide-${idx}`,
-              start: "top 80%",
-              end: "top 40%",
-              scrub: 1,
-            },
-          });
+          mobileTl.fromTo(`.slide-${idx} .tech-line-mask`,
+            { clipPath: "polygon(0 0, 0 100%, 0 100%, 0 0)" },
+            { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", stagger: 0.08 },
+            0
+          )
+            .fromTo(`.slide-${idx} .slide-bg-visual`,
+              { opacity: 0, scale: 1.25 },
+              { opacity: 1, scale: 1.0 },
+              0
+            )
+            .fromTo(`.slide-${idx} .slide-spec-row`,
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0 },
+              0.2
+            );
         });
 
-        // Outro slide animation for mobile
         gsap.fromTo(
           ".slide-outro .outro-creed",
           { opacity: 0, y: 30 },
@@ -339,8 +342,8 @@ export default function KineticSkills({ isLoading = false }) {
             y: 0,
             scrollTrigger: {
               trigger: ".slide-outro",
-              start: "top 85%",
-              end: "top 55%",
+              start: "top 80%",
+              end: "top 50%",
               scrub: 1,
             },
           }
@@ -356,15 +359,15 @@ export default function KineticSkills({ isLoading = false }) {
       id="skills"
       className="relative w-full min-h-screen lg:h-screen bg-[#050505] overflow-visible lg:overflow-hidden border-b border-white/[0.03]"
     >
-      {/* Background radial spotlight glow backing */}
+      {/* Background radial spotlight glow */}
       <div className="skills-backing-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] h-[55vh] bg-[#ff8000]/[0.015] rounded-full blur-[140px] pointer-events-none z-0 transition-colors duration-700" />
 
       {/* Grid Backdrop */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.008)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.008)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
-      {/* Slide Track Container (Horizontal 800vw on desktop, vertical 100% on mobile) */}
-      <div className="skills-slide-track flex flex-col lg:flex-row w-full lg:w-[800vw] h-full relative z-10">
-        
+      {/* Slide Track Container */}
+      <div className="skills-slide-track flex flex-col lg:flex-row w-full lg:w-[800vw] h-auto lg:h-full relative z-10">
+
         {skillsData.map((category, idx) => (
           <div
             key={category.id}
@@ -378,7 +381,7 @@ export default function KineticSkills({ isLoading = false }) {
             </div>
 
             <div className="max-w-[1400px] w-full mx-auto flex flex-col h-full justify-between relative z-10">
-              
+
               {/* Header Info */}
               <div className="flex justify-between items-start w-full select-none pt-4">
                 <div>
@@ -396,13 +399,13 @@ export default function KineticSkills({ isLoading = false }) {
 
               {/* Main Content Split Area */}
               <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-center justify-between my-auto w-full">
-                
+
                 {/* Left Column: Technology Story Lines */}
                 <div className="w-full lg:w-[48%] flex flex-col gap-4 text-left">
-                  <span className="font-mono text-[8px] uppercase tracking-[0.25em] text-[#ff8000] block mb-2 select-none">
+                  <span className="font-mono text-[8px] uppercase tracking-[0.25em] block mb-2 select-none" style={{ color: category.color }}>
                     // Core Stack
                   </span>
-                  
+
                   <div className="flex flex-col gap-3">
                     {category.skills.map((skill, sIdx) => {
                       const isHovered = hoveredTech === skill.name;
@@ -412,9 +415,8 @@ export default function KineticSkills({ isLoading = false }) {
                           key={sIdx}
                           onMouseEnter={() => setHoveredTech(skill.name)}
                           onMouseLeave={() => setHoveredTech(null)}
-                          className={`tech-line-mask flex flex-col py-3 border-b border-white/[0.04] transition-all duration-300 ${
-                            isAnyHovered && !isHovered ? "blur-[2px] opacity-20 scale-[0.98]" : "opacity-100 scale-100"
-                          }`}
+                          className={`tech-line-mask flex flex-col py-3 border-b border-white/[0.04] transition-[opacity,transform,filter] duration-500 ${isAnyHovered && !isHovered ? "blur-[2px] opacity-20 scale-[0.98]" : "opacity-100 scale-100"
+                            }`}
                           style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
                         >
                           <div className="flex justify-between items-end">
@@ -476,7 +478,7 @@ export default function KineticSkills({ isLoading = false }) {
         <div className="slide-outro w-full lg:w-screen h-screen flex-shrink-0 relative flex flex-col justify-center items-center text-center p-8 bg-[#050505] overflow-hidden">
           {/* Radial outro glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[45vh] bg-[#ff8000]/[0.012] rounded-full blur-[140px] pointer-events-none z-0" />
-          
+
           <div className="outro-creed max-w-2xl relative z-10 px-6">
             <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#ff8000] mb-4 block select-none">
               Outro
