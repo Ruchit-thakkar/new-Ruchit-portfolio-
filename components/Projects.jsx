@@ -18,19 +18,17 @@ const projectsData = [
     url: "directshare.app",
     demo: "https://directshare-ruchit.netlify.app",
     github: "https://github.com/Ruchit-thakkar/DirectShare.git",
-    challenge: "Reliable browser-to-browser large file transfers.",
-    solution: "WebRTC + Chunked Transfer + IndexedDB + Recovery System",
+    challenge: "How can browsers share files securely without cloud storage?",
+    solution: "WebRTC + Chunk Transfer + IndexedDB + Recovery",
     color: "#ff8000",
     metrics: [
-      { label: "Technologies", value: "15+" },
-      { label: "WebRTC", value: "Real-Time" },
-      { label: "Railway", value: "Production" },
-      { label: "FastAPI", value: "Backend" }
+      { label: "Transfer Speed", value: "40MB/s+" },
+      { label: "Browser Based", value: "100%" },
+      { label: "End-to-End", value: "Secure" },
+      { label: "Direct Connection", value: "P2P" }
     ],
-    architecture: ["Browser", "Next.js", "API", "FastAPI", "WebRTC", "IndexedDB"],
-    features: ["WebRTC", "IndexedDB", "Web Workers", "FastAPI", "Docker", "Railway"],
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2000&auto=format&fit=crop",
-    performance: ["PWA", "Responsive", "Secure", "Optimized", "Production Ready"]
+    features: ["React", "Next.js", "FastAPI", "WebRTC", "Docker"],
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2000&auto=format&fit=crop"
   },
   {
     id: 2,
@@ -43,15 +41,13 @@ const projectsData = [
     solution: "Firebase Auth + Realtime DB + Cloud Messaging + ImageKit",
     color: "#0066cc",
     metrics: [
-      { label: "Technologies", value: "10+" },
-      { label: "Firebase", value: "Auth" },
-      { label: "Realtime", value: "Sync" },
-      { label: "Push Alerts", value: "Active" }
+      { label: "Latency", value: "100ms" },
+      { label: "Sync Rate", value: "100%" },
+      { label: "Session Auth", value: "Secure" },
+      { label: "Alert Status", value: "Active" }
     ],
-    architecture: ["Browser", "React", "Firebase", "Realtime DB", "Cloud Messaging", "ImageKit"],
     features: ["Firebase", "React", "ImageKit", "Cloud Messaging", "Tailwind"],
-    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2000&auto=format&fit=crop",
-    performance: ["Secure", "Responsive", "Cloud Sync", "Optimized", "Active Alerts"]
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2000&auto=format&fit=crop"
   },
   {
     id: 3,
@@ -61,18 +57,16 @@ const projectsData = [
     demo: "https://mediadrop-ruchit.netlify.app",
     github: "https://github.com/Ruchit-thakkar/MediaDrop.git",
     challenge: "Large media processing inside the browser.",
-    solution: "Flask Backend + FFmpeg + yt-dlp + Streaming pipeline",
+    solution: "Flask Backend + FFmpeg Engine + yt-dlp Downloader + Streaming",
     color: "#8a2be2",
     metrics: [
-      { label: "Technologies", value: "8+" },
-      { label: "FFmpeg", value: "Pipeline" },
-      { label: "Flask", value: "API" },
-      { label: "yt-dlp", value: "Engine" }
+      { label: "Resolution", value: "1080p" },
+      { label: "Processing", value: "8x Speed" },
+      { label: "REST APIs", value: "Protected" },
+      { label: "Pipeline", value: "Direct" }
     ],
-    architecture: ["Browser", "React", "Flask", "FFmpeg", "yt-dlp", "Streaming"],
     features: ["Flask", "FFmpeg", "yt-dlp", "React", "Tailwind", "Python"],
-    image: "https://images.unsplash.com/photo-1611339555312-e607c8352fd7?q=80&w=2574&auto=format&fit=crop",
-    performance: ["FFmpeg", "PWA", "Secure", "Optimized", "Direct Stream"]
+    image: "https://images.unsplash.com/photo-1611339555312-e607c8352fd7?q=80&w=2574&auto=format&fit=crop"
   }
 ];
 
@@ -92,30 +86,35 @@ export default function Projects({ isLoading = false }) {
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
-      // Set initial states for entrance reveals
-      gsap.set(".projects-header-title", { opacity: 0, y: 30, filter: "blur(10px)" });
-      gsap.set(".left-progress-container", { opacity: 0, x: -30 });
-      gsap.set(".project-showcase-card", { opacity: 0, y: 50, pointerEvents: "none" });
-      gsap.set(".creed-cta-card", { opacity: 0, pointerEvents: "none" });
-      gsap.set(".cta-underline", { scaleX: 0 });
+      // Set initial state for poster cards
+      gsap.set(".poster-card", {
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        xPercent: -50,
+        yPercent: -50,
+        width: 320,
+        height: 450,
+        borderRadius: 24,
+      });
 
-      // Prep first metrics & arch lines
-      gsap.set(".arch-line", { scaleX: 0 });
-      gsap.set(".project-p-0, .project-p-1, .project-p-2", { color: "#52525b" });
+      gsap.set(".projects-intro-title", { opacity: 0, y: 30, filter: "blur(10px)" });
+      gsap.set(".project-stage", { opacity: 0, xPercent: 100 });
+      gsap.set(".editorial-overlay", { opacity: 0, pointerEvents: "none" });
 
       if (prefersReducedMotion) {
-        // Fallback for reduced motion: simple page reveals
+        // Fallback for reduced motion
         const tl = gsap.timeline({
           scrollTrigger: {
-            trigger: sectionRef.current,
+            trigger: containerRef.current,
             start: "top top",
             end: "+=150%",
             pin: true,
             scrub: 1,
           },
         });
-        tl.to(".projects-header-title", { opacity: 1, filter: "blur(0px)", y: 0, duration: 1 });
-        tl.to(".project-showcase-card-0", { opacity: 1, y: 0, duration: 1 }, "-=0.3");
+        tl.to(".projects-intro-title", { opacity: 1, filter: "blur(0px)", y: 0, duration: 1 });
+        tl.to(".project-stage-0", { opacity: 1, xPercent: 0, duration: 1 }, "-=0.3");
         return;
       }
 
@@ -131,481 +130,432 @@ export default function Projects({ isLoading = false }) {
         },
       });
 
-      // Orbiting text floats
-      gsap.to(".bg-tech-orbit", {
-        y: "random(-15, 15)",
-        x: "random(-15, 15)",
-        duration: "random(5, 8)",
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut"
-      });
-
       // Phase 1: Section Title Reveal (0% to 10%)
       mainTimeline.fromTo(
-        ".projects-header-title",
+        ".projects-intro-title",
         { opacity: 0, y: 30, filter: "blur(8px)" },
         { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power2.out" },
         0.1
       );
 
-      // Phase 2: Navigation & Project 1 Reveal (10% to 25%)
+      // Phase 2: Slide 1 Entrance (10% to 30%)
+      mainTimeline.to(".projects-intro-title", { opacity: 0, y: -20, duration: 0.6 }, 0.8);
       mainTimeline.fromTo(
-        ".left-progress-container",
-        { opacity: 0, x: -30 },
-        { opacity: 1, x: 0, duration: 0.8, ease: "power2.out" },
-        0.8
+        ".project-stage-0",
+        { opacity: 0, xPercent: 100 },
+        { opacity: 1, xPercent: 0, duration: 1.0, ease: "power2.out" },
+        1.0
       );
-      mainTimeline.to(".project-p-0", { color: "#ff8000", duration: 0.4 }, 1.0);
-      mainTimeline.to(".project-progress-bar", { scaleY: 0.05, duration: 0.4 }, 1.0);
       mainTimeline.to(".project-spotlight", { backgroundColor: "rgba(255, 128, 0, 0.025)", duration: 0.8 }, 1.0);
 
-      mainTimeline.to(".project-showcase-card-0", { opacity: 1, pointerEvents: "auto", y: 0, duration: 0.8 }, 1.0);
-      mainTimeline.fromTo(
-        ".project-showcase-card-0 .browser-window-wrapper",
-        { scale: 0.9, opacity: 0 },
-        { scale: 1.0, opacity: 1, duration: 1.0, ease: "power3.out" },
-        1.0
-      );
-      mainTimeline.to(".project-showcase-card-0 .arch-line", { scaleX: 1, stagger: 0.15, duration: 0.8, ease: "power2.inOut" }, 1.3);
-
-      // Metric Counter Animation (DirectShare: 15+ Techs)
-      const countObj0 = { val: 0 };
+      // Project 1 expands
       mainTimeline.to(
-        countObj0,
+        ".poster-card-0",
         {
-          val: 15,
-          duration: 1.0,
-          onUpdate: () => {
-            const el = document.querySelector(".project-showcase-card-0 .count-tech");
-            if (el) el.textContent = Math.floor(countObj0.val) + "+";
-          },
+          width: "100vw",
+          height: "100vh",
+          borderRadius: "0px",
+          duration: 1.2,
+          ease: "power2.inOut",
         },
-        1.0
+        1.2
       );
+      mainTimeline.to(".poster-card-0 .poster-image", { scale: 1.05, duration: 1.2, ease: "power2.inOut" }, 1.2);
+      mainTimeline.to(".poster-card-0 .poster-details", { opacity: 0, duration: 0.4 }, 1.2);
+      mainTimeline.to(".editorial-overlay-0", { opacity: 1, pointerEvents: "auto", duration: 0.6 }, 1.8);
 
-      // Phase 3: Transition to Project 2 (25% to 50%)
-      mainTimeline.to(".project-showcase-card-0", { opacity: 0, y: -40, duration: 0.8, ease: "power2.in" }, 2.5);
-      mainTimeline.to(".project-p-0", { color: "#52525b", duration: 0.4 }, 2.5);
-
-      // Spotlight shift to Blue
-      mainTimeline.to(".project-spotlight", { backgroundColor: "rgba(0, 102, 204, 0.025)", duration: 0.8 }, 2.7);
-
-      mainTimeline.to(".project-p-1", { color: "#0066cc", duration: 0.4 }, 2.9);
-      mainTimeline.to(".project-progress-bar", { scaleY: 0.5, duration: 0.4 }, 2.9);
-
-      mainTimeline.to(".project-showcase-card-1", { opacity: 1, pointerEvents: "auto", y: 0, duration: 0.8 }, 2.9);
-      mainTimeline.fromTo(
-        ".project-showcase-card-1 .browser-window-wrapper",
-        { scale: 0.9, opacity: 0 },
-        { scale: 1.0, opacity: 1, duration: 1.0, ease: "power3.out" },
-        2.9
-      );
-      mainTimeline.to(".project-showcase-card-1 .arch-line", { scaleX: 1, stagger: 0.15, duration: 0.8, ease: "power2.inOut" }, 3.2);
-
-      // Metric Counter Animation (Herald: 10+ Techs)
-      const countObj1 = { val: 0 };
+      // Phase 3: Transition to Project 2 (30% to 55%)
+      mainTimeline.to(".editorial-overlay-0", { opacity: 0, pointerEvents: "none", duration: 0.6 }, 2.6);
       mainTimeline.to(
-        countObj1,
+        ".poster-card-0",
         {
-          val: 10,
+          width: 320,
+          height: 450,
+          borderRadius: 24,
           duration: 1.0,
-          onUpdate: () => {
-            const el = document.querySelector(".project-showcase-card-1 .count-tech");
-            if (el) el.textContent = Math.floor(countObj1.val) + "+";
-          },
+          ease: "power2.inOut",
         },
-        2.9
+        2.8
       );
+      mainTimeline.to(".poster-card-0 .poster-image", { scale: 1.2, duration: 1.0, ease: "power2.inOut" }, 2.8);
+      mainTimeline.to(".poster-card-0 .poster-details", { opacity: 1, duration: 0.4 }, 3.4);
+      mainTimeline.to(".project-stage-0", { xPercent: -100, opacity: 0, duration: 1.0, ease: "power2.inOut" }, 2.8);
 
-      // Phase 4: Transition to Project 3 (50% to 75%)
-      mainTimeline.to(".project-showcase-card-1", { opacity: 0, y: -40, duration: 0.8, ease: "power2.in" }, 4.5);
-      mainTimeline.to(".project-p-1", { color: "#52525b", duration: 0.4 }, 4.5);
-
-      // Spotlight shift to Purple
-      mainTimeline.to(".project-spotlight", { backgroundColor: "rgba(138, 43, 226, 0.025)", duration: 0.8 }, 4.7);
-
-      mainTimeline.to(".project-p-2", { color: "#8a2be2", duration: 0.4 }, 4.9);
-      mainTimeline.to(".project-progress-bar", { scaleY: 1.0, duration: 0.4 }, 4.9);
-
-      mainTimeline.to(".project-showcase-card-2", { opacity: 1, pointerEvents: "auto", y: 0, duration: 0.8 }, 4.9);
+      // Project 2 Slides In
       mainTimeline.fromTo(
-        ".project-showcase-card-2 .browser-window-wrapper",
-        { scale: 0.9, opacity: 0 },
-        { scale: 1.0, opacity: 1, duration: 1.0, ease: "power3.out" },
-        4.9
+        ".project-stage-1",
+        { opacity: 0, xPercent: 100 },
+        { opacity: 1, xPercent: 0, duration: 1.0, ease: "power2.out" },
+        3.2
       );
-      mainTimeline.to(".project-showcase-card-2 .arch-line", { scaleX: 1, stagger: 0.15, duration: 0.8, ease: "power2.inOut" }, 5.2);
+      mainTimeline.to(".project-spotlight", { backgroundColor: "rgba(0, 102, 204, 0.025)", duration: 0.8 }, 3.2);
 
-      // Metric Counter Animation (MediaDrop: 8+ Techs)
-      const countObj2 = { val: 0 };
+      // Project 2 expands
       mainTimeline.to(
-        countObj2,
+        ".poster-card-1",
         {
-          val: 8,
-          duration: 1.0,
-          onUpdate: () => {
-            const el = document.querySelector(".project-showcase-card-2 .count-tech");
-            if (el) el.textContent = Math.floor(countObj2.val) + "+";
-          },
+          width: "100vw",
+          height: "100vh",
+          borderRadius: "0px",
+          duration: 1.2,
+          ease: "power2.inOut",
         },
-        4.9
+        3.6
       );
+      mainTimeline.to(".poster-card-1 .poster-image", { scale: 1.05, duration: 1.2, ease: "power2.inOut" }, 3.6);
+      mainTimeline.to(".poster-card-1 .poster-details", { opacity: 0, duration: 0.4 }, 3.6);
+      mainTimeline.to(".editorial-overlay-1", { opacity: 1, pointerEvents: "auto", duration: 0.6 }, 4.2);
 
-      // Phase 5: Fadeout before Creed CTA (75% to 90%)
-      mainTimeline.to(".project-showcase-card-2", { opacity: 0, y: -40, duration: 0.8, ease: "power2.in" }, 6.5);
-      mainTimeline.to(".left-progress-container", { opacity: 0, x: -20, duration: 0.8 }, 6.5);
-      mainTimeline.to(".projects-header-title", { opacity: 0, y: -20, duration: 0.8 }, 6.5);
-      mainTimeline.to(".project-spotlight", { backgroundColor: "rgba(255, 128, 0, 0.015)", duration: 0.8 }, 6.5);
-
-      // Phase 6: Final Creed CTA (90% to 100%)
+      // Phase 4: Transition to Project 3 (55% to 80%)
+      mainTimeline.to(".editorial-overlay-1", { opacity: 0, pointerEvents: "none", duration: 0.6 }, 5.0);
       mainTimeline.to(
-        ".creed-cta-card",
-        { opacity: 1, pointerEvents: "auto", duration: 0.8, ease: "power2.out" },
-        7.5
+        ".poster-card-1",
+        {
+          width: 320,
+          height: 450,
+          borderRadius: 24,
+          duration: 1.0,
+          ease: "power2.inOut",
+        },
+        5.2
       );
-      mainTimeline.to(
-        ".cta-underline",
-        { scaleX: 1, duration: 1.0, ease: "power3.inOut" },
-        7.9
-      );
+      mainTimeline.to(".poster-card-1 .poster-image", { scale: 1.2, duration: 1.0, ease: "power2.inOut" }, 5.2);
+      mainTimeline.to(".poster-card-1 .poster-details", { opacity: 1, duration: 0.4 }, 5.8);
+      mainTimeline.to(".project-stage-1", { xPercent: -100, opacity: 0, duration: 1.0, ease: "power2.inOut" }, 5.2);
 
-      return () => {
-        if (mainTimeline) mainTimeline.kill();
-      };
+      // Project 3 Slides In
+      mainTimeline.fromTo(
+        ".project-stage-2",
+        { opacity: 0, xPercent: 100 },
+        { opacity: 1, xPercent: 0, duration: 1.0, ease: "power2.out" },
+        5.6
+      );
+      mainTimeline.to(".project-spotlight", { backgroundColor: "rgba(138, 43, 226, 0.025)", duration: 0.8 }, 5.6);
+
+      // Project 3 expands
+      mainTimeline.to(
+        ".poster-card-2",
+        {
+          width: "100vw",
+          height: "100vh",
+          borderRadius: "0px",
+          duration: 1.2,
+          ease: "power2.inOut",
+        },
+        6.0
+      );
+      mainTimeline.to(".poster-card-2 .poster-image", { scale: 1.05, duration: 1.2, ease: "power2.inOut" }, 6.0);
+      mainTimeline.to(".poster-card-2 .poster-details", { opacity: 0, duration: 0.4 }, 6.0);
+      mainTimeline.to(".editorial-overlay-2", { opacity: 1, pointerEvents: "auto", duration: 0.6 }, 6.6);
+
+      // Phase 5: Transition to Ending Finale (80% to 100%)
+      mainTimeline.to(".editorial-overlay-2", { opacity: 0, pointerEvents: "none", duration: 0.6 }, 7.4);
+      mainTimeline.to(
+        ".poster-card-2",
+        {
+          width: 320,
+          height: 450,
+          borderRadius: 24,
+          duration: 1.0,
+          ease: "power2.inOut",
+        },
+        7.6
+      );
+      mainTimeline.to(".poster-card-2 .poster-image", { scale: 1.2, duration: 1.0, ease: "power2.inOut" }, 7.6);
+      mainTimeline.to(".poster-card-2 .poster-details", { opacity: 1, duration: 0.4 }, 8.2);
+      mainTimeline.to(".project-stage-2", { xPercent: -100, opacity: 0, duration: 1.0, ease: "power2.inOut" }, 7.6);
+
+      // Finale Slides In
+      mainTimeline.fromTo(
+        ".project-stage-finale",
+        { opacity: 0, xPercent: 100 },
+        { opacity: 1, xPercent: 0, duration: 1.0, ease: "power2.out" },
+        8.0
+      );
+      mainTimeline.to(".project-spotlight", { backgroundColor: "rgba(255, 128, 0, 0.015)", duration: 0.8 }, 8.0);
+
+      // Finale expands
+      mainTimeline.to(
+        ".poster-card-finale",
+        {
+          width: "100vw",
+          height: "100vh",
+          borderRadius: "0px",
+          duration: 1.2,
+          ease: "power2.inOut",
+        },
+        8.4
+      );
+      mainTimeline.to(".poster-card-finale .poster-image", { scale: 1.05, duration: 1.2, ease: "power2.inOut" }, 8.4);
+      mainTimeline.to(".poster-card-finale .poster-details", { opacity: 0, duration: 0.4 }, 8.4);
+      mainTimeline.to(".editorial-overlay-finale", { opacity: 1, pointerEvents: "auto", duration: 0.6 }, 9.0);
     },
     { scope: containerRef, dependencies: [mounted, isLoading] }
   );
 
-  // 3D Tilt & Spotlight Follower inside the Browser window wrapper
-  const onMouseMoveBrowser = (e) => {
+  // 3D Tilt on centered poster cards (before they expand)
+  const onMouseMovePoster = (e) => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const el = e.currentTarget;
+    if (el.offsetWidth > 400) return; // Prevent tilt on full-screen cover
+
     const rect = el.getBoundingClientRect();
     const relX = e.clientX - (rect.left + rect.width / 2);
     const relY = e.clientY - (rect.top + rect.height / 2);
 
-    // Subtle 3D tilt
     gsap.to(el, {
-      rotateX: -relY * 0.01,
-      rotateY: relX * 0.01,
+      rotateX: -relY * 0.018,
+      rotateY: relX * 0.018,
+      scale: 1.025,
       duration: 0.5,
       ease: "power2.out",
     });
-
-    // Translate glass reflection and backing lights
-    const reflection = el.querySelector(".browser-reflection");
-    if (reflection) {
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      gsap.to(reflection, {
-        x: mouseX - 100,
-        y: mouseY - 100,
-        duration: 0.4,
-        ease: "power3.out",
-      });
-    }
   };
 
-  const onMouseLeaveBrowser = (e) => {
+  const onMouseLeavePoster = (e) => {
     const el = e.currentTarget;
     gsap.to(el, {
       rotateX: 0,
       rotateY: 0,
+      scale: 1.0,
       duration: 0.8,
       ease: "elastic.out(1, 0.6)",
     });
   };
 
-  if (!mounted) return null;
-
   return (
     <section
-      id="projects"
       ref={containerRef}
+      id="projects"
       className="relative w-full h-screen bg-[#050505] flex flex-col justify-center items-center overflow-hidden border-b border-white/[0.03]"
     >
       {/* Background radial spotlight glow backing */}
-      <div className="project-spotlight absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[75vw] h-[45vh] bg-[#ff8000]/[0.02] rounded-full blur-[150px] pointer-events-none z-0 transition-colors duration-700" />
+      <div className="project-spotlight absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[50vh] bg-[#ff8000]/[0.02] rounded-full blur-[140px] pointer-events-none z-0 transition-colors duration-700" />
 
       {/* Decorative dark grid backdrop */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0" />
 
-      <div className="max-w-[1600px] w-full mx-auto px-6 md:px-12 lg:px-20 h-full flex flex-col justify-center relative z-10">
+      {/* Projects introductory title */}
+      <div className="projects-intro-title absolute text-center z-10 pointer-events-none select-none">
+        <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#ff8000] mb-2 block">
+          Featured Work
+        </span>
+        <h2 className="font-sans text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-none">
+          Exhibition
+        </h2>
+      </div>
+
+      {/* Project Stages Container */}
+      <div className="relative w-full h-full flex justify-center items-center">
         
-        {/* Header section */}
-        <div className="projects-header-title flex justify-between items-end border-b border-white/10 pb-6 mb-12 select-none w-full">
-          <h2 className="text-4xl md:text-6xl font-heading uppercase tracking-tighter text-white">
-            Projects
-          </h2>
-          <span className="font-mono text-xs uppercase tracking-[0.25em] text-zinc-500 text-right">
-            03 // Showcase
-          </span>
-        </div>
-
-        {/* Dashboard layout Stage */}
-        <div className="w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-
-          {/* Left Vertical Progress Navigation */}
-          <div className="left-progress-container w-full lg:w-[15%] hidden lg:flex flex-col items-start gap-6 select-none pl-4">
-            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-zinc-500">// METRICS</span>
-            <div className="h-44 w-[1.5px] bg-white/[0.08] relative">
-              <div className="project-progress-bar absolute top-0 left-0 w-full bg-[#ff8000] origin-top scale-y-0 h-full" />
-            </div>
-            <div className="flex flex-col gap-4 font-mono text-[10px]">
-              <span className="project-p-0 font-bold tracking-widest block transition-colors duration-300">01 / DirectShare</span>
-              <span className="project-p-1 font-bold tracking-widest block transition-colors duration-300">02 / Herald</span>
-              <span className="project-p-2 font-bold tracking-widest block transition-colors duration-300">03 / MediaDrop</span>
-            </div>
-          </div>
-
-          {/* Right Presentation Dashboard Panel */}
-          <div className="w-full lg:w-[85%] relative h-[70vh] md:h-[52vh] lg:h-[55vh] flex items-center">
+        {projectsData.map((project, idx) => (
+          <div
+            key={project.id}
+            className={`project-stage project-stage-${idx} absolute inset-0 w-full h-full flex flex-col justify-center items-center pointer-events-none`}
+          >
             
-            {projectsData.map((project, idx) => (
-              <div
-                key={project.id}
-                className={`project-showcase-card project-showcase-card-${idx} absolute inset-0 flex flex-col md:flex-row gap-8 lg:gap-16 w-full h-full pointer-events-none opacity-0`}
-              >
+            {/* Center Poster Card */}
+            <div
+              onMouseMove={onMouseMovePoster}
+              onMouseLeave={onMouseLeavePoster}
+              className={`poster-card poster-card-${idx} rounded-[24px] border border-white/10 bg-zinc-950 overflow-hidden relative shadow-[0_15px_40px_rgba(0,0,0,0.6)] z-10 flex-shrink-0 cursor-none pointer-events-auto`}
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-full object-cover poster-image select-none pointer-events-none scale-125"
+              />
+              <div className="absolute inset-0 bg-black/45 z-10 pointer-events-none" />
+              <div className="absolute bottom-8 left-8 right-8 z-20 pointer-events-none text-left poster-details transition-opacity duration-300">
+                <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#ff8000]">
+                  Exhibition Poster
+                </span>
+                <h4 className="font-sans text-2xl font-black uppercase tracking-tight text-white mt-1 leading-none">
+                  {project.title}
+                </h4>
+                <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-500 block mt-1.5">
+                  {project.category}
+                </span>
+              </div>
+            </div>
+
+            {/* Editorial Overlays (problem/solution/outcome/specs/buttons) */}
+            <div
+              className={`editorial-overlay editorial-overlay-${idx} absolute inset-0 w-full h-full z-20 flex flex-col justify-between p-8 md:p-12 lg:p-16 pointer-events-none`}
+            >
+              {/* Top row */}
+              <div className="flex justify-between items-start w-full">
+                <div>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-500">
+                    Selected Work
+                  </span>
+                  <h3 className="font-sans text-3xl lg:text-4xl font-black uppercase tracking-tight text-white mt-1 leading-none">
+                    {project.title}
+                  </h3>
+                  <span className="font-mono text-[9px] uppercase tracking-wider text-[#ff8000] block mt-1.5">
+                    // {project.category}
+                  </span>
+                </div>
+                <div className="font-mono text-xs text-zinc-500">
+                  <span className="text-white font-bold">0{project.id}</span> / 03
+                </div>
+              </div>
+
+              {/* Middle row: Problem vs Solution */}
+              <div className="flex flex-col md:flex-row gap-8 lg:gap-16 w-full justify-between items-start my-auto">
                 
-                {/* 3D Browser Mockup Column */}
-                <div
-                  onMouseMove={onMouseMoveBrowser}
-                  onMouseLeave={onMouseLeaveBrowser}
-                  className="browser-window-wrapper w-full md:w-[48%] aspect-[4/3] md:h-full rounded-[20px] border border-white/[0.08] bg-white/[0.01] backdrop-blur-[20px] overflow-hidden relative shadow-[0_15px_40px_rgba(0,0,0,0.6)] flex-shrink-0 group pointer-events-auto cursor-none flex flex-col justify-between"
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  
-                  {/* Floating ambient tech name orbit */}
-                  <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-                    {project.features.map((tech, tIdx) => {
-                      const positions = [
-                        "top-[12%] left-[12%]",
-                        "top-[18%] right-[15%]",
-                        "bottom-[22%] left-[10%]",
-                        "bottom-[18%] right-[12%]",
-                        "top-[55%] left-[8%]",
-                        "bottom-[50%] right-[6%]"
-                      ];
-                      return (
-                        <span
-                          key={tech}
-                          className={`absolute font-mono text-[10px] uppercase tracking-widest bg-tech-orbit text-zinc-500 opacity-10 ${positions[tIdx % positions.length]}`}
-                        >
-                          {tech}
-                        </span>
-                      );
-                    })}
-                  </div>
-
-                  {/* Browser Window Header */}
-                  <div className="browser-window-header h-9 px-4 flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-md relative z-20 pointer-events-none">
-                    <div className="flex gap-1.5 items-center">
-                      <span className="w-2 h-2 rounded-full bg-[#ff5f56]" />
-                      <span className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
-                      <span className="w-2 h-2 rounded-full bg-[#27c93f]" />
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-md bg-zinc-950/40 border border-white/5 w-[140px] md:w-[180px] justify-center">
-                      <svg className="w-2 h-2 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <span className="font-mono text-[8px] text-zinc-500 tracking-wide">{project.url}</span>
-                    </div>
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-mono text-[8px] uppercase tracking-wider text-[#ff8000] flex items-center gap-1 hover:opacity-85 pointer-events-auto"
-                    >
-                      Live ↗
-                    </a>
-                  </div>
-
-                  {/* Browser Window Body (Overlapping Mockup Layers) */}
-                  <div className="browser-body relative w-full h-full overflow-hidden flex items-center justify-center pointer-events-none z-10">
-                    
-                    {/* Glass Reflection spotlight */}
-                    <div
-                      className="absolute w-[200px] h-[200px] bg-white/[0.04] rounded-full blur-[40px] pointer-events-none -translate-x-1/2 -translate-y-1/2 browser-reflection"
-                      style={{ left: 0, top: 0 }}
-                    />
-
-                    {/* Desktop Screenshot */}
-                    <div className="screenshot-layer desktop-layer w-[72%] aspect-[16/10] rounded-lg border border-white/10 overflow-hidden shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-[1.03] group-hover:rotate-1">
-                      <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
-                    </div>
-
-                    {/* Tablet Screenshot */}
-                    <div className="screenshot-layer tablet-layer absolute w-[30%] aspect-[3/4] bottom-6 left-6 rounded-lg border border-white/10 overflow-hidden shadow-2xl z-20 hidden md:block transition-transform duration-500 group-hover:scale-[1.05] group-hover:-rotate-3 group-hover:-translate-x-2">
-                      <img src={project.image} alt={project.title} className="w-full h-full object-cover saturate-[0.8]" />
-                    </div>
-
-                    {/* Mobile Screenshot */}
-                    <div className="screenshot-layer mobile-layer absolute w-[16%] aspect-[9/19] bottom-6 right-6 rounded-md border border-white/10 overflow-hidden shadow-2xl z-30 hidden md:block transition-transform duration-500 group-hover:scale-[1.08] group-hover:rotate-3 group-hover:translate-y-[-8px]">
-                      <img src={project.image} alt={project.title} className="w-full h-full object-cover saturate-[1.2]" />
-                    </div>
-
-                  </div>
+                {/* Left: Problem */}
+                <div className="w-full md:w-[48%] text-left">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-zinc-500 block mb-2">
+                    The Challenge
+                  </span>
+                  <h4 className="font-serif italic text-lg md:text-xl lg:text-2xl font-light text-zinc-300 leading-relaxed max-w-xl">
+                    {project.challenge}
+                  </h4>
                 </div>
 
-                {/* Technical Description & Analytics Column */}
-                <div className="w-full md:w-[52%] flex flex-col justify-between py-2 select-none">
-                  <div>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-500 block mb-1">
-                      Featured Project // {project.category}
-                    </span>
-                    <h3 className="font-sans text-2xl lg:text-3xl font-black uppercase tracking-tight text-white mt-1 hover:text-[#ff8000] transition-colors duration-300">
-                      {project.title}
-                    </h3>
-                  </div>
-
-                  {/* Interactive Metric Cards */}
-                  <div className="grid grid-cols-2 gap-3 mt-4">
-                    {project.metrics.map((metric, mIdx) => (
-                      <div
-                        key={mIdx}
-                        className="metric-card px-4 py-3 rounded-xl bg-white/[0.02] border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex flex-col justify-center transition-all duration-500 hover:translate-y-[-4px] hover:border-white/10 hover:bg-white/[0.04]"
-                      >
-                        <span className="font-mono text-[18px] font-black text-white tracking-tight leading-none count-tech">
-                          {mIdx === 0 ? "0+" : metric.value}
-                        </span>
-                        <span className="font-mono text-[8px] uppercase tracking-widest text-zinc-500 mt-1">
-                          {metric.label}
+                {/* Right: Solution Vertical Stream */}
+                <div className="w-full md:w-[45%] text-left flex flex-col gap-3">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#ff8000] block mb-1">
+                    The Solution
+                  </span>
+                  <div className="flex flex-wrap md:flex-col gap-2.5">
+                    {project.solution.split(" + ").map((solNode, sIdx) => (
+                      <div key={sIdx} className="flex items-center gap-3 solution-step">
+                        <span className="font-mono text-[9px] text-[#ff8000]">0{sIdx + 1}</span>
+                        <span className="font-mono text-[11px] uppercase tracking-widest text-white font-semibold">
+                          {solNode}
                         </span>
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
 
-                  {/* Key Challenge -> Solution Panel */}
-                  <div className="challenge-solution-card group/cs bg-white/[0.015] border border-white/5 rounded-2xl p-4 mt-4 relative overflow-hidden transition-all duration-300 hover:border-white/10 hover:bg-white/[0.025]">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative">
-                      <div className="w-full md:w-[46%] transition-transform duration-500 group-hover/cs:-translate-x-2">
-                        <span className="font-mono text-[8px] uppercase tracking-wider text-zinc-500 block mb-1">Challenge</span>
-                        <p className="text-[11px] text-zinc-400 font-light leading-relaxed">
-                          {project.challenge}
-                        </p>
-                      </div>
-                      <div className="hidden md:block w-[8%] h-[1px] bg-white/10 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[#ff8000] transition-transform duration-500 scale-x-0 group-hover/cs:scale-x-100 origin-left" />
-                      </div>
-                      <div className="w-full md:w-[46%] transition-transform duration-500 translate-y-1.5 group-hover/cs:translate-y-0">
-                        <span className="font-mono text-[8px] uppercase tracking-wider text-[#ff8000] block mb-1">Solution</span>
-                        <p className="text-[11px] text-white font-medium leading-relaxed">
-                          {project.solution}
-                        </p>
-                      </div>
+              {/* Bottom row: Outcomes & Tech specs */}
+              <div className="flex flex-col md:flex-row justify-between items-end w-full gap-8">
+                
+                {/* Left: Outcomes */}
+                <div className="flex flex-wrap gap-8 text-left">
+                  {project.metrics.map((metric, mIdx) => (
+                    <div key={mIdx} className="outcome-item flex flex-col justify-center">
+                      <strong className="font-sans text-xl md:text-3xl font-black text-white leading-none">
+                        {metric.value}
+                      </strong>
+                      <span className="font-mono text-[8px] uppercase tracking-widest text-zinc-500 mt-1.5">
+                        {metric.label}
+                      </span>
                     </div>
-                  </div>
+                  ))}
+                </div>
 
-                  {/* Architecture Diagram Nodes */}
-                  <div className="architecture-diagram flex items-center justify-between bg-white/[0.015] border border-white/5 rounded-xl p-3.5 mt-4 relative overflow-hidden">
-                    {project.architecture.map((node, nodeIdx) => (
-                      <React.Fragment key={node}>
-                        <div className="arch-node px-2.5 py-1.5 rounded-lg border border-white/10 bg-zinc-950 font-mono text-[8px] text-zinc-400 uppercase tracking-wider relative z-10 shadow-lg">
-                          {node}
-                        </div>
-                        {nodeIdx < project.architecture.length - 1 && (
-                          <div className="flex-grow h-[1px] relative bg-white/15 z-0 mx-1.5">
-                            <div className="absolute top-0 left-0 h-full bg-[#ff8000] arch-line origin-left scale-x-0 w-full" />
-                          </div>
-                        )}
-                      </React.Fragment>
+                {/* Right: Built With Specs & Buttons */}
+                <div className="flex flex-col gap-4 text-right items-end w-full md:w-auto">
+                  <div className="flex flex-wrap gap-2 justify-end">
+                    {project.features.map((feat) => (
+                      <span
+                        key={feat}
+                        className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-zinc-950 font-mono text-[8px] text-zinc-400 uppercase tracking-widest shadow-md"
+                      >
+                        {feat}
+                      </span>
                     ))}
                   </div>
-
-                  {/* Staggered Actions & Pills */}
-                  <div className="flex flex-wrap gap-3 items-center mt-5">
+                  <div className="flex gap-4 mt-2">
                     <a
                       href={project.demo}
                       target="_blank"
                       rel="noreferrer"
-                      className="group px-5 py-2.5 rounded-full bg-white text-black font-mono text-[9px] uppercase tracking-widest flex items-center gap-1.5 hover:bg-[#ff8000] hover:text-white transition-all duration-300 pointer-events-auto shadow-md"
+                      className="px-5 py-2 rounded-full bg-white text-black hover:bg-[#ff8000] hover:text-white font-mono text-[9px] uppercase tracking-widest flex items-center gap-1.5 transition-all duration-300 pointer-events-auto shadow-lg"
                     >
-                      Open Project
-                      <ArrowRight size={10} className="transition-transform duration-300 group-hover:translate-x-1" />
+                      Open Live Site
                     </a>
                     {project.github && (
                       <a
                         href={project.github}
                         target="_blank"
                         rel="noreferrer"
-                        className="group px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/10 text-white font-mono text-[9px] uppercase tracking-widest flex items-center gap-1.5 hover:border-white/20 transition-all duration-300 pointer-events-auto"
+                        className="px-5 py-2 rounded-full bg-white/[0.03] border border-white/10 text-white hover:border-white/20 font-mono text-[9px] uppercase tracking-widest flex items-center gap-1.5 transition-all duration-300 pointer-events-auto"
                       >
-                        View Code
+                        Source Code
                       </a>
                     )}
-                    <div className="flex gap-1.5 ml-auto">
-                      {project.performance.slice(0, 2).map((perf, pIdx) => (
-                        <span key={pIdx} className="px-3 py-1.5 rounded-md bg-white/[0.02] border border-white/[0.05] font-mono text-[8px] text-zinc-500 uppercase tracking-wider">
-                          ✓ {perf}
-                        </span>
-                      ))}
-                    </div>
                   </div>
-
                 </div>
-
               </div>
-            ))}
 
+            </div>
           </div>
-        </div>
-      </div>
+        ))}
 
-      {/* Final Premium CTA Slide */}
-      <div className="creed-cta-card absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 pointer-events-none opacity-0 select-none">
-        
-        {/* Massive watermark background */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-0">
-          <span className="font-sans font-black text-[28vw] text-white/[0.015] leading-none tracking-tighter select-none">
-            BUILD.
-          </span>
-        </div>
-
-        <div className="relative z-10 max-w-2xl flex flex-col items-center">
-          <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#ff8000] mb-6 block">
-            Next Challenge
-          </span>
-          <h2 className="font-sans text-3xl md:text-5xl font-black uppercase tracking-tight text-white leading-tight">
-            I'm always building,<br />
-            learning, and shipping<br />
-            <span className="text-[#ff8000] relative inline-block mt-2">
-              better products.
-              <span className="cta-underline absolute bottom-[-8px] left-0 w-full h-[3px] bg-[#ff8000] scale-x-0 origin-left" />
-            </span>
-          </h2>
+        {/* Finale Stage (More coming soon) */}
+        <div className="project-stage project-stage-finale absolute inset-0 w-full h-full flex flex-col justify-center items-center pointer-events-none">
           
-          <div className="flex flex-col sm:flex-row gap-4 mt-12 w-full justify-center">
-            <a
-              href="https://github.com/Ruchit-thakkar"
-              target="_blank"
-              rel="noreferrer"
-              className="px-8 py-4 rounded-xl border border-white/10 hover:border-[#ff8000]/40 bg-white/[0.02] text-white font-mono text-xs uppercase tracking-widest transition-all duration-300 pointer-events-auto"
-            >
-              Explore GitHub
-            </a>
-            <a
-              href="/resume.pdf"
-              target="_blank"
-              rel="noreferrer"
-              className="px-8 py-4 rounded-xl border border-white/10 hover:border-[#ff8000]/40 bg-white/[0.02] text-white font-mono text-xs uppercase tracking-widest transition-all duration-300 pointer-events-auto"
-            >
-              Download Resume
-            </a>
-            <a
-              href="#contact"
-              className="px-8 py-4 rounded-xl bg-[#ff8000] hover:bg-[#e07000] text-white font-mono text-xs uppercase tracking-widest transition-all duration-300 pointer-events-auto shadow-[0_0_20px_rgba(255,128,0,0.2)]"
-            >
-              Let's Build Together
-            </a>
+          {/* Centered Poster Card Finale */}
+          <div
+            onMouseMove={onMouseMovePoster}
+            onMouseLeave={onMouseLeavePoster}
+            className="poster-card poster-card-finale rounded-[24px] border border-white/10 bg-zinc-950 overflow-hidden relative shadow-[0_15px_40px_rgba(0,0,0,0.6)] z-10 flex-shrink-0 cursor-none pointer-events-auto"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <img
+              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
+              alt="Exhibition Finale"
+              className="w-full h-full object-cover poster-image select-none pointer-events-none scale-125"
+            />
+            <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" />
+            <div className="absolute bottom-8 left-8 right-8 z-20 pointer-events-none text-left poster-details transition-opacity duration-300">
+              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#ff8000]">
+                Exhibition Ending
+              </span>
+              <h4 className="font-sans text-2xl font-black uppercase tracking-tight text-white mt-1 leading-none">
+                More coming soon
+              </h4>
+            </div>
           </div>
+
+          {/* Finale Overlay */}
+          <div className="editorial-overlay editorial-overlay-finale absolute inset-0 w-full h-full z-20 flex flex-col justify-between p-8 md:p-12 lg:p-16 pointer-events-none">
+            <div className="flex justify-between items-start w-full">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-500">
+                  Exhibition Finale
+                </span>
+                <h3 className="font-sans text-3xl lg:text-4xl font-black uppercase tracking-tight text-[#ff8000] mt-1 leading-none">
+                  More Coming Soon.
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-6 text-center my-auto max-w-xl mx-auto">
+              <h4 className="font-sans text-3xl md:text-5xl font-black uppercase tracking-tight text-white leading-tight">
+                Currently building next-gen digital experiences.
+              </h4>
+              <div className="flex flex-wrap gap-3 justify-center mt-4">
+                {["AI Products", "Automation Tools", "Developer Tools", "WebGPU"].map((focus) => (
+                  <span
+                    key={focus}
+                    className="px-5 py-2.5 rounded-xl border border-white/10 bg-zinc-950 font-mono text-[10px] text-zinc-300 uppercase tracking-widest shadow-md"
+                  >
+                    {focus}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full text-center font-mono text-[9px] uppercase tracking-[0.3em] text-zinc-600">
+              // AI &bull; WebGPU &bull; Creative Technology
+            </div>
+          </div>
+
         </div>
 
       </div>
 
       {/* Bottom Scene metadata */}
       <div className="absolute bottom-8 font-mono text-[9px] uppercase tracking-[0.3em] text-white/20 pointer-events-none select-none z-10">
-        // Architecture &bull; Engineering &bull; Products
+        // Architecture &bull; Engineering &bull; Exhibition
       </div>
     </section>
   );

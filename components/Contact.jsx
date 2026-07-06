@@ -156,8 +156,6 @@ export default function Contact({ isLoading = false }) {
     setTimeout(() => setShowToast(false), 2200);
   };
 
-  if (!mounted) return null;
-
   return (
     <section
       ref={containerRef}

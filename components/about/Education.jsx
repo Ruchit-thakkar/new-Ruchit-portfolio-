@@ -293,8 +293,6 @@ export default function Education({ isLoading = false }) {
     });
   };
 
-  if (!mounted) return null;
-
   return (
     <section
       ref={sectionRef}

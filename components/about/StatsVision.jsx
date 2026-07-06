@@ -109,8 +109,6 @@ export default function StatsVision({ isLoading = false }) {
 
   }, { scope: sectionRef, dependencies: [mounted, isLoading] });
 
-  if (!mounted) return null;
-
   return (
     <section
       ref={sectionRef}

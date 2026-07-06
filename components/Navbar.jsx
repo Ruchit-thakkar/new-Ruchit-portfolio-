@@ -6,7 +6,7 @@ import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
-const links = ["Home", "About", "Skills", "Projects", "Contact"];
+const links = ["Home", "About", "Education", "Skills", "Projects", "Contact"];
 
 export default function Navbar({ isLoading = false }) {
   const [open, setOpen] = useState(false);

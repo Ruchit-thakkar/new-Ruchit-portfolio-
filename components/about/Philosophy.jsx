@@ -273,8 +273,6 @@ export default function Philosophy({ isLoading = false }) {
     });
   };
 
-  if (!mounted) return null;
-
   return (
     <section
       ref={sectionRef}

@@ -105,8 +105,6 @@ export default function Footer({ isLoading = false }) {
     });
   };
 
-  if (!mounted) return null;
-
   return (
     <footer
       ref={containerRef}

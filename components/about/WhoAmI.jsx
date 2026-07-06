@@ -388,8 +388,6 @@ export default function WhoAmI({ isLoading = false }) {
     });
   };
 
-  if (!mounted) return null;
-
   return (
     <section
       ref={sectionRef}
