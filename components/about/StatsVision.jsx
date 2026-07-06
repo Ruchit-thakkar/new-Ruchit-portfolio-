@@ -72,7 +72,7 @@ export default function StatsVision({ isLoading = false }) {
       // Vision slides transition
       tl.to(".stat-grid-container", { opacity: 0, scale: 0.9, duration: 1, pointerEvents: "none" }, 1.5);
 
-      tl.fromTo(".vision-slide-1", 
+      tl.fromTo(".vision-slide-1",
         { clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)", opacity: 0 },
         { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", opacity: 1, duration: 1 },
         2
@@ -112,9 +112,9 @@ export default function StatsVision({ isLoading = false }) {
   if (!mounted) return null;
 
   return (
-    <section 
-      ref={sectionRef} 
-      className="relative w-full h-screen flex flex-col justify-center items-center bg-[#0d0d0d] overflow-hidden border-b border-white/[0.03]"
+    <section
+      ref={sectionRef}
+      className="relative w-full h-screen flex flex-col justify-center items-center bg-[#00000] overflow-hidden border-b border-white/[0.03]"
     >
       {/* Background Orbits */}
       <div className="absolute w-[80vw] h-[80vw] md:w-[60vw] md:h-[60vw] rounded-full border border-white/[0.015] pointer-events-none z-0 flex items-center justify-center">
@@ -124,15 +124,15 @@ export default function StatsVision({ isLoading = false }) {
       {/* Container 1: Grid of Stats */}
       <div className="stat-grid-container relative z-10 w-full max-w-6xl px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         {statCounters.map((counter, idx) => (
-          <div 
-            key={idx} 
+          <div
+            key={idx}
             className="stat-box flex flex-col items-center justify-center p-8 bg-[#111111]/70 rounded-3xl border border-white/5 text-center shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:border-[#ff8000]/30 transition-all duration-500"
           >
             <span className="font-mono text-xs uppercase tracking-widest text-[#aaaaaa] mb-4">
               {counter.label}
             </span>
-            <strong 
-              id={counter.id} 
+            <strong
+              id={counter.id}
               className="font-mono text-5xl md:text-7xl font-black text-[#ff8000] leading-none select-none tracking-tight"
             >
               0{counter.suffix}

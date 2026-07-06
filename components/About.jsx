@@ -4,10 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import WhoAmI from "./about/WhoAmI";
 import Philosophy from "./about/Philosophy";
 import KineticSkills from "./about/KineticSkills";
-import CreativeProcess from "./about/CreativeProcess";
 import StatsVision from "./about/StatsVision";
-import MemoryWall from "./about/MemoryWall";
-import TransitionOut from "./about/TransitionOut";
 
 export default function About({ isLoading = false }) {
   const containerRef = useRef(null);
@@ -30,10 +27,7 @@ export default function About({ isLoading = false }) {
       <WhoAmI isLoading={isLoading} />
       <Philosophy isLoading={isLoading} />
       <KineticSkills isLoading={isLoading} />
-      <CreativeProcess isLoading={isLoading} />
       <StatsVision isLoading={isLoading} />
-      <MemoryWall isLoading={isLoading} />
-      <TransitionOut isLoading={isLoading} />
     </div>
   );
 }
