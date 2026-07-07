@@ -116,6 +116,8 @@ export default function AdvancedHero({ isLoading }) {
   useGSAP(() => {
     if (isLoading) return;
 
+    const isMobile = window.innerWidth < 768;
+
     // Split text nodes for character/word/line animations
     const heySplit = new SplitText(heyRef.current, { type: "chars" });
     const nameSplit = new SplitText(nameRef.current, { type: "chars" });
@@ -124,7 +126,7 @@ export default function AdvancedHero({ isLoading }) {
 
     // Set initial states to avoid unstyled flashes
     gsap.set([bgGlow1Ref.current, bgGlow2Ref.current], { opacity: 0 });
-    gsap.set(portraitRef.current, { opacity: 0, scale: 0.985, filter: "blur(12px)" });
+    gsap.set(portraitRef.current, { opacity: 0, scale: 0.985, filter: isMobile ? "none" : "blur(12px)" });
     gsap.set(dividerRef.current, { opacity: 0, filter: "drop-shadow(0 0 0px rgba(255,86,10,0))" });
     gsap.set(".particle", { opacity: 0 });
     gsap.set(lineDividerRef.current, { opacity: 0, scaleX: 0, transformOrigin: "left center" });
@@ -149,7 +151,7 @@ export default function AdvancedHero({ isLoading }) {
       .to([bgGlow1Ref.current, bgGlow2Ref.current], { opacity: 1, duration: 0.5 })
       
       // Stage 2: Portrait appears (scale 0.985 -> 1, opacity, slight blur removal)
-      .to(portraitRef.current, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.2 }, "-=0.2")
+      .to(portraitRef.current, { opacity: 1, scale: 1, filter: isMobile ? "none" : "blur(0px)", duration: 1.2 }, "-=0.2")
       
       // Stage 3: Energy divider fades in, glow increases naturally
       .to(dividerRef.current, {
@@ -351,13 +353,13 @@ export default function AdvancedHero({ isLoading }) {
   }, { scope: heroRef, dependencies: [isLoading] });
 
   return (
-    <section ref={heroRef} id="home" className="relative isolate min-h-[900px] overflow-hidden bg-[#020303] text-white md:min-h-[760px] md:h-[100svh] w-full" style={{ perspective: "1000px" }}>
+    <section ref={heroRef} id="home" className="relative isolate min-h-[900px] h-[100svh] overflow-hidden bg-[#020303] text-white md:min-h-[760px] md:h-[100svh] w-full" style={{ perspective: "1000px" }}>
       
       {/* HERO CONTENT: SCALES DOWN AND FADES ON EXIT */}
       <div ref={heroContentRef} className="w-full h-full relative origin-center">
         {/* Background Gradients */}
         <div ref={bgGlow1Ref} className="absolute inset-0 bg-[radial-gradient(circle_at_75%_38%,rgba(255,46,14,.22),transparent_38%),radial-gradient(circle_at_48%_55%,rgba(255,104,28,.08),transparent_25%)]" />
-        <div ref={bgGlow2Ref} className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(0deg,#020303_18%,transparent_50%),linear-gradient(90deg,#020303_0%,#020303_34%,rgba(2,3,3,.76)_45%,transparent_68%)]" />
+        <div ref={bgGlow2Ref} className="pointer-events-none absolute inset-0 z-[1] md:z-[3] bg-[linear-gradient(0deg,#020303_18%,transparent_50%),linear-gradient(90deg,#020303_0%,#020303_34%,rgba(2,3,3,.76)_45%,transparent_68%)]" />
         <ParticleField />
         <SocialRail />
 
@@ -387,7 +389,7 @@ export default function AdvancedHero({ isLoading }) {
             ruchitRevealedImg={ruchitRevealedImg}
           />
 
-          <div className="pointer-events-none absolute inset-0 z-[4] shadow-[inset_0_-120px_100px_#020303] md:shadow-[inset_110px_0_100px_#020303,inset_0_-90px_90px_rgba(2,3,3,.45)]" />
+          <div className="pointer-events-none absolute inset-0 z-[4] shadow-[inset_0_-30px_30px_#020303] md:shadow-[inset_110px_0_100px_#020303,inset_0_-90px_90px_rgba(2,3,3,.45)]" />
         </div>
 
         <div ref={availabilityRef} className="hero-enter absolute bottom-[44px] right-[4vw] z-20 hidden min-w-[330px] items-center gap-4 rounded-[20px] border border-[#ff681c]/60 bg-black/60 px-7 py-5 backdrop-blur-xl md:flex">

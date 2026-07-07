@@ -65,6 +65,8 @@ export default function WhoAmI({ isLoading = false }) {
         },
       });
 
+      const isMobile = window.innerWidth < 1024;
+
       entranceTl
         .from(".intro-label", { opacity: 0, x: -20, duration: 0.6 })
         .from(
@@ -86,8 +88,8 @@ export default function WhoAmI({ isLoading = false }) {
         )
         .fromTo(
           portraitContainerRef.current,
-          { opacity: 0, scale: 0.92, y: "-45%" },
-          { opacity: 1, scale: 1, y: "-50%", duration: 1, ease: "power3.out" },
+          { opacity: 0, scale: 0.92, xPercent: isMobile ? -50 : 0, y: "-45%" },
+          { opacity: 1, scale: 1, xPercent: isMobile ? -50 : 0, y: "-50%", duration: 1, ease: "power3.out" },
           "-=0.7"
         );
 
@@ -191,6 +193,7 @@ export default function WhoAmI({ isLoading = false }) {
           mainTimeline.to(
             portraitContainerRef.current,
             {
+              xPercent: isMobile ? -50 : 0,
               x: portraitX,
               y: portraitY,
               scale: isMobile ? 0.85 : 0.95,
@@ -228,7 +231,7 @@ export default function WhoAmI({ isLoading = false }) {
           mainTimeline.to(".narrative-slide-1", { opacity: 1, pointerEvents: "auto", duration: 0.4 }, 2.5);
           mainTimeline.from(".narrative-label-1", { opacity: 0, y: 15, duration: 0.4 }, 2.5);
           mainTimeline.to(".narrative-watermark", { opacity: 1, y: 0, duration: 0.4 }, 2.5);
-          
+
           if (block1Split && block1Split.lines.length > 0) {
             block1Split.lines.forEach((line, idx) => {
               const t = 2.6 + idx * 0.25;
@@ -262,7 +265,7 @@ export default function WhoAmI({ isLoading = false }) {
           // --- Slide 2 Entrance (BACKGROUND) ---
           mainTimeline.to(".narrative-slide-2", { opacity: 1, pointerEvents: "auto", duration: 0.4 }, 3.8);
           mainTimeline.from(".narrative-label-2", { opacity: 0, y: 15, duration: 0.4 }, 3.8);
-          
+
           const bgChars = document.querySelectorAll(".narrative-slide-2 .bg-char");
           if (bgChars.length > 0) {
             mainTimeline.to(
@@ -402,7 +405,7 @@ export default function WhoAmI({ isLoading = false }) {
         className="relative w-full h-full max-w-7xl mx-auto px-6 md:px-16 flex flex-col lg:flex-row items-center justify-between"
       >
         {/* Intro */}
-        <div className="intro-container w-full lg:w-[48%] flex flex-col justify-center text-left relative z-10 h-full lg:h-auto pt-24 lg:pt-0">
+        <div className="intro-container w-full lg:w-[48%] flex flex-col justify-start lg:justify-center text-center lg:text-left items-center lg:items-start relative z-10 h-auto pt-20 lg:pt-0">
           <span className="intro-label font-mono text-[11px] uppercase tracking-[0.3em] text-[#ff8000] mb-5 flex items-center gap-2.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#ff8000] shadow-[0_0_8px_#ff8000]" />
             Introduction
@@ -417,7 +420,7 @@ export default function WhoAmI({ isLoading = false }) {
           </h2>
           <div
             ref={subTextRef}
-            className="mt-8 flex flex-col gap-1.5 border-l-2 border-[#ff8000] pl-5"
+            className="mt-6 lg:mt-8 flex flex-col gap-1.5 border-l-0 lg:border-l-2 border-[#ff8000] pl-0 lg:pl-5 items-center lg:items-start"
           >
             <span className="font-mono text-[11px] uppercase tracking-widest text-zinc-400">
               Ahmedabad, India
@@ -429,8 +432,8 @@ export default function WhoAmI({ isLoading = false }) {
         </div>
 
         {/* Narrative Container — absolute frame containing absolute slides */}
-        <div className="narrative-col w-full lg:w-[42%] h-[60vh] flex items-center justify-start relative z-10 lg:ml-auto pb-24 lg:pb-0">
-          
+        <div className="narrative-col absolute lg:relative w-full lg:w-[42%] h-[40vh] lg:h-[60vh] flex items-center justify-center lg:justify-start z-10 left-0 bottom-6 lg:bottom-auto lg:left-auto lg:ml-auto pb-12 lg:pb-0">
+
           {/* Giant background watermarks for the active slide numbers */}
           <div className="absolute inset-0 flex items-center justify-center lg:justify-end pointer-events-none select-none overflow-hidden z-0">
             <span className="narrative-watermark font-sans font-black text-[30vw] lg:text-[18vw] text-white/[0.012] leading-none select-none pointer-events-none transition-all duration-300">
@@ -440,23 +443,23 @@ export default function WhoAmI({ isLoading = false }) {
 
           <div className="relative w-full h-full flex flex-col justify-center z-10">
             {/* Slide 1: WHO AM I */}
-            <div className="narrative-slide narrative-slide-1 absolute inset-0 flex flex-col justify-center gap-4 w-full">
+            <div className="narrative-slide narrative-slide-1 absolute inset-0 flex flex-col justify-center items-center lg:items-start text-center lg:text-left gap-4 w-full px-6 lg:px-0">
               <span className="narrative-label-1 font-mono text-[11px] uppercase tracking-[0.3em] text-[#ff8000] mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#ff8000]" />
                 01 // Concept
               </span>
-              <h3 className="narrative-block-1-text font-serif italic text-3xl md:text-[36px] lg:text-[42px] font-light leading-[1.3] tracking-tight text-white max-w-xl">
+              <h3 className="narrative-block-1-text font-serif italic text-2xl md:text-[36px] lg:text-[42px] font-light leading-[1.3] tracking-tight text-white max-w-xl">
                 I build digital interfaces that feel inevitable.
               </h3>
             </div>
 
             {/* Slide 2: BACKGROUND */}
-            <div className="narrative-slide narrative-slide-2 absolute inset-0 flex flex-col justify-center gap-5 w-full">
+            <div className="narrative-slide narrative-slide-2 absolute inset-0 flex flex-col justify-center items-center lg:items-start text-center lg:text-left gap-5 w-full px-6 lg:px-0">
               <span className="narrative-label-2 font-mono text-[11px] uppercase tracking-[0.3em] text-[#ff8000] mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#ff8000]" />
                 02 // Background
               </span>
-              <div className="narrative-block-2-text text-[16px] md:text-[18px] text-zinc-400 font-light leading-relaxed tracking-wide flex flex-col gap-3 max-w-lg">
+              <div className="narrative-block-2-text text-[15px] md:text-[18px] text-zinc-400 font-light leading-relaxed tracking-wide flex flex-col gap-3 max-w-lg text-center lg:text-left">
                 <div className="bg-line-1">
                   {"Studying Information Technology.".split("").map((char, cIdx) => (
                     <span key={cIdx} className="bg-char inline-block">{char === " " ? "\u00A0" : char}</span>
@@ -471,12 +474,12 @@ export default function WhoAmI({ isLoading = false }) {
             </div>
 
             {/* Slide 3: WHAT I BUILD */}
-            <div className="narrative-slide narrative-slide-3 absolute inset-0 flex flex-col justify-center gap-6 w-full">
+            <div className="narrative-slide narrative-slide-3 absolute inset-0 flex flex-col justify-center items-center lg:items-start text-center lg:text-left gap-6 w-full px-6 lg:px-0">
               <span className="narrative-label-3 font-mono text-[11px] uppercase tracking-[0.3em] text-[#ff8000] mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#ff8000]" />
                 03 // Craft
               </span>
-              <div className="narrative-block-3-list flex flex-col gap-4">
+              <div className="narrative-block-3-list flex flex-col gap-3 lg:items-start items-center">
                 {[
                   "Full-stack applications",
                   "Real-time platforms",
@@ -501,14 +504,14 @@ export default function WhoAmI({ isLoading = false }) {
             </div>
 
             {/* Slide 4: PHILOSOPHY */}
-            <div className="narrative-slide narrative-slide-4 absolute inset-0 flex flex-col justify-center gap-4 w-full">
+            <div className="narrative-slide narrative-slide-4 absolute inset-0 flex flex-col justify-center items-center lg:items-start text-center lg:text-left gap-4 w-full px-6 lg:px-0">
               <span className="narrative-label-4 font-mono text-[11px] uppercase tracking-[0.3em] text-[#ff8000] mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#ff8000]" />
                 04 // Creed
               </span>
               <p
                 ref={philosophyTextRef}
-                className="narrative-block-4-text text-[22px] md:text-[24px] lg:text-[28px] text-zinc-200 font-light italic tracking-wide leading-relaxed max-w-xl"
+                className="narrative-block-4-text text-[18px] md:text-[24px] lg:text-[28px] text-zinc-200 font-light italic tracking-wide leading-relaxed max-w-xl text-center lg:text-left"
               >
                 Good code is invisible. Great design isn&rsquo;t.
               </p>
@@ -521,11 +524,10 @@ export default function WhoAmI({ isLoading = false }) {
       {/* Hero portrait — untouched: same right-to-left concept, same pin */}
       <div
         ref={portraitContainerRef}
-        className="absolute z-20 left-[56vw] top-[50%] flex justify-center items-center pointer-events-none lg:pointer-events-auto"
-        style={{ width: "360px", height: "480px" }}
+        className="absolute z-20 left-1/2 -translate-x-1/2 lg:left-[56vw] lg:translate-x-0 top-[62%] lg:top-[50%] flex justify-center items-center pointer-events-none lg:pointer-events-auto w-[250px] h-[340px] sm:w-[320px] sm:h-[430px] lg:w-[360px] lg:h-[480px]"
       >
         <div
-          className="portrait-inner-frame will-change-transform w-[280px] h-[380px] sm:w-[350px] sm:h-[460px] rounded-2xl overflow-hidden border border-white/[0.07] shadow-[0_0_50px_rgba(0,0,0,0.8)] bg-zinc-900 relative cursor-none"
+          className="portrait-inner-frame will-change-transform w-full h-full rounded-2xl overflow-hidden border border-white/[0.07] shadow-[0_0_50px_rgba(0,0,0,0.8)] bg-zinc-900 relative cursor-none"
           style={{ transformStyle: "preserve-3d" }}
           onMouseMove={onMouseMovePortrait}
           onMouseLeave={onMouseLeavePortrait}
