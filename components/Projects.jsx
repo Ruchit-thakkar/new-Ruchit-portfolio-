@@ -500,7 +500,7 @@ export default function Projects({ isLoading = false }) {
             style={{ transformStyle: "preserve-3d" }}
           >
             <img
-              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1782275455679-8926ea0b88fc?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Exhibition Finale"
               className="w-full h-full object-cover poster-image select-none pointer-events-none scale-125"
             />
